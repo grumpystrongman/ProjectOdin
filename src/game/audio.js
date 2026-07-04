@@ -11,19 +11,28 @@ export class AdaptiveAudio {
   }
 
   start() {
-    if (this.started) return;
+    if (this.started) {
+      this.resume();
+      return;
+    }
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     if (!AudioContext) return;
     this.ctx = new AudioContext();
     this.master = this.ctx.createGain();
-    this.master.gain.value = 0.16;
+    this.master.gain.value = 0.22;
     this.master.connect(this.ctx.destination);
-    this.createDrone('low', 110, 0.045, 'sine');
-    this.createDrone('warmth', 220, 0.028, 'triangle');
-    this.createDrone('air', 440, 0.012, 'sine');
+    this.createDrone('low', 110, 0.055, 'sine');
+    this.createDrone('warmth', 220, 0.036, 'triangle');
+    this.createDrone('air', 440, 0.018, 'sine');
+    this.createDrone('luteBed', 330, 0.012, 'triangle');
     this.createPulse();
     this.started = true;
+    this.resume();
     this.tickMelody();
+  }
+
+  resume() {
+    if (this.ctx?.state === 'suspended') this.ctx.resume();
   }
 
   createDrone(name, freq, gain, type) {
@@ -33,7 +42,7 @@ export class AdaptiveAudio {
     osc.type = type;
     osc.frequency.value = freq;
     filter.type = 'lowpass';
-    filter.frequency.value = 760;
+    filter.frequency.value = 880;
     g.gain.value = gain;
     osc.connect(filter);
     filter.connect(g);
@@ -47,7 +56,7 @@ export class AdaptiveAudio {
     const g = this.ctx.createGain();
     osc.type = 'triangle';
     osc.frequency.value = 55;
-    g.gain.value = 0.01;
+    g.gain.value = 0.012;
     osc.connect(g);
     g.connect(this.master);
     osc.start();
@@ -61,66 +70,44 @@ export class AdaptiveAudio {
     const g = this.nodes.pulse.g.gain;
     g.cancelScheduledValues(now);
     g.setValueAtTime(0.002, now);
-    g.linearRampToValueAtTime(0.032, now + 0.04);
-    g.exponentialRampToValueAtTime(0.003, now + 0.7);
-    setTimeout(() => this.tickPulse(), this.currentRealm === 'foundry' ? 960 : 1700);
+    g.linearRampToValueAtTime(0.038, now + 0.04);
+    g.exponentialRampToValueAtTime(0.003, now + 0.72);
+    setTimeout(() => this.tickPulse(), this.currentRealm === 'foundry' ? 900 : 1550);
   }
 
   tickMelody() {
     if (!this.ctx || !this.started) return;
-    const base = {
-      idle: 220,
-      archive: 196,
-      forge: 174.61,
-      foundry: 174.61,
-      citadel: 246.94,
-      sanctum: 261.63,
-      observatory: 293.66,
-      workshop: 220
-    }[this.currentRealm] || 220;
-    const step = this.scale[Math.floor(Math.random() * this.scale.length)];
+    const base = { idle: 220, about: 220, resume: 196, chronicle: 246.94, foundry: 174.61, ai: 261.63, healthcare: 196, leadership: 246.94, workshop: 220 }[this.currentRealm] || 220;
+    const phrase = [0, 4, 7, 9, 7, 4, 2, 0];
+    const step = phrase[Math.floor(Math.random() * phrase.length)];
     const freq = base * Math.pow(2, step / 12);
     const osc = this.ctx.createOscillator();
     const g = this.ctx.createGain();
     const filter = this.ctx.createBiquadFilter();
-    osc.type = 'sine';
+    osc.type = Math.random() > 0.5 ? 'sine' : 'triangle';
     osc.frequency.value = freq;
     filter.type = 'lowpass';
-    filter.frequency.value = 1800;
+    filter.frequency.value = 2000;
     g.gain.setValueAtTime(0.0001, this.ctx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.035, this.ctx.currentTime + 0.06);
-    g.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 1.8);
+    g.gain.exponentialRampToValueAtTime(0.06, this.ctx.currentTime + 0.05);
+    g.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 2.2);
     osc.connect(filter);
     filter.connect(g);
     g.connect(this.master);
     osc.start();
-    osc.stop(this.ctx.currentTime + 2.0);
+    osc.stop(this.ctx.currentTime + 2.4);
     clearTimeout(this.melodyTimer);
-    this.melodyTimer = setTimeout(() => this.tickMelody(), 1900 + Math.random() * 2200);
+    this.melodyTimer = setTimeout(() => this.tickMelody(), 1300 + Math.random() * 1900);
   }
 
   setRealm(realm) {
     if (!this.started || realm === this.currentRealm) return;
     this.currentRealm = realm;
-    const freq = {
-      idle: 110,
-      about: 123.47,
-      resume: 130.81,
-      chronicle: 146.83,
-      archive: 146.83,
-      forge: 98,
-      foundry: 98,
-      ai: 164.81,
-      sanctum: 164.81,
-      healthcare: 116.54,
-      leadership: 138.59,
-      citadel: 138.59,
-      workshop: 110
-    }[realm] || 110;
+    const freq = { idle: 110, about: 123.47, resume: 130.81, chronicle: 146.83, foundry: 98, ai: 164.81, healthcare: 116.54, leadership: 138.59, workshop: 110 }[realm] || 110;
     const now = this.ctx.currentTime;
     this.nodes.low.osc.frequency.exponentialRampToValueAtTime(freq, now + 1.4);
     this.nodes.warmth.osc.frequency.exponentialRampToValueAtTime(freq * 2.01, now + 1.7);
-    this.nodes.air.filter.frequency.linearRampToValueAtTime(realm === 'ai' ? 1700 : 960, now + 1.3);
+    this.nodes.air.filter.frequency.linearRampToValueAtTime(realm === 'ai' ? 1900 : 1060, now + 1.3);
   }
 
   accent() {
@@ -132,7 +119,7 @@ export class AdaptiveAudio {
     osc.frequency.setValueAtTime(523.25, this.ctx.currentTime);
     osc.frequency.exponentialRampToValueAtTime(783.99, this.ctx.currentTime + 0.22);
     g.gain.setValueAtTime(0.0001, this.ctx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.11, this.ctx.currentTime + 0.03);
+    g.gain.exponentialRampToValueAtTime(0.12, this.ctx.currentTime + 0.03);
     g.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 0.9);
     osc.connect(g);
     g.connect(this.master);
