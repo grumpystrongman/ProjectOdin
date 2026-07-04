@@ -102,50 +102,60 @@ export function renderContactGlyphs(canvas, token = '', contact = null) {
   const w = canvas.width;
   const h = canvas.height;
   ctx.clearRect(0, 0, w, h);
+
   const gradient = ctx.createLinearGradient(0, 0, w, h);
   gradient.addColorStop(0, '#09111f');
+  gradient.addColorStop(0.55, '#071426');
   gradient.addColorStop(1, '#02050a');
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, w, h);
 
-  ctx.strokeStyle = 'rgba(242,199,109,.55)';
+  ctx.strokeStyle = 'rgba(242,199,109,.65)';
   ctx.lineWidth = 2;
   ctx.strokeRect(18, 18, w - 36, h - 36);
   ctx.strokeStyle = 'rgba(126,231,255,.22)';
-  for (let x = 42; x < w - 42; x += 32) {
+  ctx.strokeRect(30, 30, w - 60, h - 60);
+
+  for (let x = 470; x < w - 40; x += 28) {
     ctx.beginPath();
-    ctx.moveTo(x, 30 + Math.sin(x) * 6);
-    ctx.lineTo(x + 12, h - 30 + Math.cos(x) * 6);
+    ctx.moveTo(x, 42 + Math.sin(x) * 6);
+    ctx.lineTo(x + 10, h - 42 + Math.cos(x) * 6);
     ctx.stroke();
   }
 
-  ctx.save();
-  ctx.translate(0, Math.sin(Date.now() / 400) * 2);
-  ctx.font = '700 24px Georgia';
-  ctx.fillStyle = '#f2c76d';
-  ctx.fillText('CONTACT SEAL UNLOCKED', 52, 72);
-
-  // Canvas drawn contact values. Replace these in deployment if desired.
   const email = contact?.email || 'cmajeff@gmail.com';
   const phone = contact?.phone || 'available on request';
-  drawDistorted(ctx, email, 54, 132, 34, '#eafcff');
-  drawDistorted(ctx, phone, 54, 186, 24, '#9fefff');
-  ctx.font = '12px ui-monospace, monospace';
-  ctx.fillStyle = 'rgba(234,252,255,.44)';
-  ctx.fillText(`trust token: ${token || 'local-seal'}`, 54, 226);
-  ctx.restore();
+  const linkedin = contact?.linkedin || 'LinkedIn profile available from Jeff Barnes';
+
+  ctx.font = '700 18px ui-sans-serif, system-ui, Segoe UI, sans-serif';
+  ctx.fillStyle = '#f2c76d';
+  ctx.fillText('CONTACT UNLOCKED', 52, 62);
+
+  ctx.font = '800 34px Georgia, serif';
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText('Jeff Barnes', 52, 108);
+
+  ctx.font = '700 18px ui-sans-serif, system-ui, Segoe UI, sans-serif';
+  ctx.fillStyle = 'rgba(234,252,255,.72)';
+  ctx.fillText('Business Intelligence • Data Engineering • AI • Healthcare Analytics', 52, 139);
+
+  drawContactRow(ctx, 'EMAIL', email, 52, 184, '#eafcff');
+  drawContactRow(ctx, 'PHONE', phone, 52, 221, '#9fefff');
+
+  ctx.font = '600 12px ui-monospace, SFMono-Regular, Consolas, monospace';
+  ctx.fillStyle = 'rgba(234,252,255,.46)';
+  ctx.fillText(`trust token: ${token || 'local-seal'}`, 52, 246);
+
+  ctx.font = '600 12px ui-sans-serif, system-ui, Segoe UI, sans-serif';
+  ctx.fillStyle = 'rgba(242,199,109,.72)';
+  ctx.fillText(linkedin, 430, 246);
 }
 
-function drawDistorted(ctx, text, x, y, size, color) {
-  ctx.font = `800 ${size}px Georgia`;
+function drawContactRow(ctx, label, value, x, y, color) {
+  ctx.font = '700 12px ui-sans-serif, system-ui, Segoe UI, sans-serif';
+  ctx.fillStyle = 'rgba(242,199,109,.84)';
+  ctx.fillText(label, x, y - 21);
+  ctx.font = '800 26px ui-sans-serif, system-ui, Segoe UI, sans-serif';
   ctx.fillStyle = color;
-  [...text].forEach((ch, i) => {
-    const dx = x + i * size * 0.55;
-    const dy = y + Math.sin(i * 1.7) * 2;
-    ctx.save();
-    ctx.translate(dx, dy);
-    ctx.rotate(Math.sin(i) * 0.015);
-    ctx.fillText(ch, 0, 0);
-    ctx.restore();
-  });
+  ctx.fillText(value, x, y);
 }
