@@ -17,6 +17,7 @@ const required = [
   'src/game/state.js',
   'src/game/token.js',
   'src/game/trial.js',
+  'public/data/linkedin-gallery.json',
   'docs/sprint-3-execution.md',
   'docs/live-github-sync.md',
   'docs/sprint-4-backlog.md'
@@ -33,13 +34,18 @@ const main = fs.readFileSync(path.join(root, 'src/main.js'), 'utf8');
 const scene = fs.readFileSync(path.join(root, 'src/game/scene3d.js'), 'utf8');
 const trial = fs.readFileSync(path.join(root, 'src/game/trial.js'), 'utf8');
 const content = fs.readFileSync(path.join(root, 'src/game/content.js'), 'utf8');
+const linkedinData = fs.readFileSync(path.join(root, 'public/data/linkedin-gallery.json'), 'utf8');
 
 const checks = [
   ['Three.js scene import', scene.includes("from 'three'")],
   ['OdinScene exported', scene.includes('export class OdinScene')],
   ['Jeff identity leads the site', index.includes('Jeff Barnes') && index.includes('Explore Jeff')],
   ['LinkedIn profile wired', content.includes('https://www.linkedin.com/in/cmajeff/') && main.includes('linkedinGallery')],
+  ['LinkedIn gallery export present', linkedinData.includes('linkedin-7478760880571088896') && linkedinData.includes('media.licdn.com')],
   ['Posts gallery district present', content.includes('LinkedIn and Posts Gallery') && content.includes('post-gallery-wall')],
+  ['Readable interaction detail panel present', index.includes('detailPanel') && main.includes('openDetail') && main.includes('closeDetailPanel')],
+  ['Detail panel releases pointer lock', main.includes('document.exitPointerLock') && main.includes('detailPanel.classList.remove')],
+  ['Gallery images rendered in detail panel', main.includes('renderGalleryCard') && main.includes('<img src=')],
   ['Pointer lock controls wired', main.includes('requestPointerLock') && main.includes('pointerlockchange')],
   ['Mouse look wired', main.includes('movementX') && main.includes('movementY')],
   ['WASD and arrow movement wired', main.includes("keys.has('w')") && main.includes("keys.has('arrowup')")],
