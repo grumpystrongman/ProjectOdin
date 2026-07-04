@@ -32,10 +32,14 @@ const index = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 const main = fs.readFileSync(path.join(root, 'src/main.js'), 'utf8');
 const scene = fs.readFileSync(path.join(root, 'src/game/scene3d.js'), 'utf8');
 const trial = fs.readFileSync(path.join(root, 'src/game/trial.js'), 'utf8');
+const content = fs.readFileSync(path.join(root, 'src/game/content.js'), 'utf8');
 
 const checks = [
   ['Three.js scene import', scene.includes("from 'three'")],
   ['OdinScene exported', scene.includes('export class OdinScene')],
+  ['Jeff identity leads the site', index.includes('Jeff Barnes') && index.includes('Explore Jeff')],
+  ['LinkedIn profile wired', content.includes('https://www.linkedin.com/in/cmajeff/') && main.includes('linkedinGallery')],
+  ['Posts gallery district present', content.includes('LinkedIn and Posts Gallery') && content.includes('post-gallery-wall')],
   ['Pointer lock controls wired', main.includes('requestPointerLock') && main.includes('pointerlockchange')],
   ['Mouse look wired', main.includes('movementX') && main.includes('movementY')],
   ['WASD and arrow movement wired', main.includes("keys.has('w')") && main.includes("keys.has('arrowup')")],
