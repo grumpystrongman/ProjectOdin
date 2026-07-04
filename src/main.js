@@ -21,6 +21,11 @@ const artifactRealm = $('artifactRealm');
 const artifactTitle = $('artifactTitle');
 const artifactBody = $('artifactBody');
 const artifactMeta = $('artifactMeta');
+const detailPanel = $('detailPanel');
+const closeDetail = $('closeDetail');
+const detailKicker = $('detailKicker');
+const detailTitle = $('detailTitle');
+const detailContent = $('detailContent');
 const objectiveTitle = $('objectiveTitle');
 const objectiveText = $('objectiveText');
 const realmTag = $('realmTag');
@@ -60,6 +65,7 @@ let started = false;
 let activeRealm = null;
 let vaultNear = false;
 let repositoryPayload = save.data.repositoryCache || githubSeeds;
+let galleryPayload = linkedinGallery;
 let lastSaveAt = 0;
 let focusedInteraction = null;
 let worldClickHint = '';
@@ -93,6 +99,7 @@ continueButton.addEventListener('click', begin);
 codexButton.addEventListener('click', openCodex);
 closeCodex.addEventListener('click', () => { codexPanel.classList.add('hidden'); lockPointer(); });
 closeTrial.addEventListener('click', () => { trialModal.classList.add('hidden'); lockPointer(); });
+closeDetail.addEventListener('click', closeDetailPanel);
 syncButton.addEventListener('click', hydrateRepositories);
 backendButton.addEventListener('click', checkBackend);
 cameraButton.addEventListener('click', () => startCameraBeat('arrival'));
@@ -102,6 +109,7 @@ document.querySelectorAll('[data-trial]').forEach((button) => button.addEventLis
 
 renderMinimap();
 updateHud();
+loadGalleryData();
 requestAnimationFrame(loop);
 
 function begin() {
@@ -121,13 +129,14 @@ function begin() {
 }
 
 function lockPointer() {
-  if (!started || !codexPanel.classList.contains('hidden') || !trialModal.classList.contains('hidden')) return;
+  if (!started || !codexPanel.classList.contains('hidden') || !trialModal.classList.contains('hidden') || !detailPanel.classList.contains('hidden')) return;
   canvas.requestPointerLock?.();
 }
 
 function onPointerLockChange() {
   const locked = document.pointerLockElement === canvas;
-  pauseOverlay.classList.toggle('hidden', locked || !started);
+  const contentOpen = !detailPanel.classList.contains('hidden') || !codexPanel.classList.contains('hidden') || !trialModal.classList.contains('hidden');
+  pauseOverlay.classList.toggle('hidden', locked || !started || contentOpen);
   reticle.classList.toggle('paused', !locked);
 }
 
@@ -139,7 +148,7 @@ function onMouseMove(event) {
 }
 
 function onMouseWheel(event) {
-  if (!started) return;
+  if (!started || !detailPanel.classList.contains('hidden') || !codexPanel.classList.contains('hidden')) return;
   event.preventDefault();
   player.fov = clamp(player.fov + Math.sign(event.deltaY) * 4, 42, 84);
   worldClickHint = player.fov <= 48 ? 'Zoomed in' : player.fov >= 80 ? 'Zoomed out' : 'Mouse wheel zoom adjusted';
@@ -157,6 +166,11 @@ function onWorldClick() {
 function onKeyDown(event) {
   const key = event.key.toLowerCase();
   if (movementKeys.has(key)) event.preventDefault();
+  if (!detailPanel.classList.contains('hidden') && key === 'escape') {
+    event.preventDefault();
+    closeDetailPanel();
+    return;
+  }
   keys.add(key);
   if (key === 'escape') document.exitPointerLock?.();
   if (key === 'c') openCodex();
@@ -262,11 +276,11 @@ function interactWithFocused() {
   else if (type === 'tablet') inspectTablet(Number(id));
   else if (type === 'portal') inspectPortal(id);
   else if (type === 'vault') openTrial();
-  else if (type === 'gate') showToastMessage('The Great Gate', `This is the central threshold into ${socialProfile.name}'s work, projects, leadership, AI, and healthcare analytics story.`);
-  else if (type === 'river') showToastMessage('Glowing Data River', 'The river represents governed data moving through platforms, pipelines, decisions, and people.');
-  else if (type === 'terrain') showToastMessage('Ancient Terrain', `You are walking through ${socialProfile.name}'s first-person portfolio world. Paths, districts, and imported assets come next.`);
-  else if (type === 'ruin') showToastMessage(label || 'Ancient Structure', 'This structure is part of the grounded world shell. It will become a richer district element as the hub grows.');
-  else showToastMessage(label || 'World Object', `This object is part of ${socialProfile.name}'s explorable Project ODIN world.`);
+  else if (type === 'gate') openDetail('Great Gate', 'The Great Gate', `<p>This is the central threshold into ${escapeHTML(socialProfile.name)}'s work, projects, leadership, AI, and healthcare analytics story.</p>`);
+  else if (type === 'river') openDetail('World Feature', 'Glowing Data River', '<p>The river represents governed data moving through platforms, pipelines, decisions, and people.</p>');
+  else if (type === 'terrain') openDetail('World Feature', 'Ancient Terrain', `<p>You are walking through ${escapeHTML(socialProfile.name)}'s first-person portfolio world. Paths, districts, and imported assets come next.</p>`);
+  else if (type === 'ruin') openDetail('World Structure', label || 'Ancient Structure', '<p>This structure is part of the grounded world shell. It will become a richer district element as the hub grows.</p>');
+  else openDetail('World Object', label || 'World Object', `<p>This object is part of ${escapeHTML(socialProfile.name)}'s explorable Project ODIN world.</p>`);
 }
 
 function renderInteractionPrompt() {
@@ -278,8 +292,8 @@ function renderInteractionPrompt() {
   }
   const { type, id, label } = focusedInteraction.userData;
   reticle.classList.add('locked');
-  if (type === 'artifact') interactionPrompt.textContent = `Click to inspect: ${artifacts[id]?.title || label}`;
-  else if (type === 'galleryPost') interactionPrompt.textContent = `Click to view gallery card: ${linkedinGallery.find((item) => item.id === id)?.title || label}`;
+  if (type === 'artifact') interactionPrompt.textContent = `Click to open: ${artifacts[id]?.title || label}`;
+  else if (type === 'galleryPost') interactionPrompt.textContent = `Click to view gallery card: ${galleryPayload.find((item) => item.id === id)?.title || label}`;
   else if (type === 'tablet') interactionPrompt.textContent = `Click to read tablet ${Number(id) + 1}`;
   else if (type === 'portal') interactionPrompt.textContent = `Click to study district: ${realms.find((r) => r.id === id)?.name || label}`;
   else if (type === 'vault') interactionPrompt.textContent = 'Click to enter the Vault of Trust';
@@ -295,6 +309,14 @@ function inspectArtifact(id) {
     audio.accent();
     unlock('firstArtifact');
     if (artifact.realm === 'workshop') unlock('workshop');
+  }
+  if (id === 'post-gallery-wall' || id === 'public-voice-archive') {
+    showGalleryList();
+    return;
+  }
+  if (id === 'linkedin-profile-gate') {
+    openDetail('LinkedIn Profile', 'Jeff Barnes on LinkedIn', `<p>Open Jeff's LinkedIn profile and recent posts.</p>${linkButton(socialProfile.linkedin, 'Open LinkedIn Profile')}`);
+    return;
   }
   showArtifact(id);
 }
@@ -313,38 +335,31 @@ function inspectPortal(id) {
   if (!realm) return;
   save.visitRealm(id);
   activeRealm = id;
-  showToastMessage(realm.name, realm.plain || realm.quest);
+  openDetail(realm.short, realm.name, `<p><strong>${escapeHTML(realm.title)}</strong></p><p>${escapeHTML(realm.body)}</p><p>${escapeHTML(realm.plain || realm.quest)}</p>`);
   updateHud(realm, 0);
 }
 
 function showArtifact(id) {
   const artifact = artifacts[id];
   const realm = realms.find((r) => r.id === artifact.realm);
-  artifactPanel.classList.remove('hidden');
-  artifactRealm.textContent = `${realm.name} / ${artifact.type}`;
-  artifactTitle.textContent = artifact.title;
-  artifactBody.textContent = artifact.body;
-  artifactMeta.innerHTML = `<span>${save.data.discoveredArtifacts.length} artifacts</span><span>${save.data.visitedRealms.length} districts</span><span>${world.syncStatus} workshop</span>`;
+  artifactPanel.classList.add('hidden');
+  openDetail(`${realm.name} / ${artifact.type}`, artifact.title, `<p>${escapeHTML(artifact.body)}</p>${metaPills([`${save.data.discoveredArtifacts.length} artifacts`, `${save.data.visitedRealms.length} districts`, `${world.syncStatus} workshop`])}`);
   updateHud(realm, 0);
 }
 
+function showGalleryList() {
+  const cards = galleryPayload.map((item) => renderGalleryCard(item)).join('');
+  openDetail('LinkedIn and Posts Gallery', 'Recent Posts and Images', `<p>These are the imported LinkedIn post cards from your scraper export. The images are shown when LinkedIn media URLs are available.</p><div class="detail-gallery-grid">${cards}</div>`);
+}
+
 function showGalleryPost(id) {
-  const item = linkedinGallery.find((post) => post.id === id);
+  const item = galleryPayload.find((post) => post.id === id);
   if (!item) return;
-  artifactPanel.classList.remove('hidden');
-  artifactRealm.textContent = `LinkedIn and Posts Gallery / ${item.category}`;
-  artifactTitle.textContent = item.title;
-  artifactBody.textContent = item.excerpt;
-  artifactMeta.innerHTML = `<span>LinkedIn source wired</span><span>${item.image ? 'image ready' : 'awaiting exported image'}</span><span><a href="${item.url}" target="_blank" rel="noreferrer">Open LinkedIn</a></span>`;
-  showToastMessage('Gallery Card', `${item.title} is wired to LinkedIn. Add exported post screenshots to turn this into a visual gallery.`);
+  openDetail(`LinkedIn and Posts Gallery / ${item.category}`, item.title, renderGalleryCard(item, true));
 }
 
 function showTablet(index) {
-  artifactPanel.classList.remove('hidden');
-  artifactRealm.textContent = `Architect Tablet ${index + 1}`;
-  artifactTitle.textContent = 'Recovered Inscription';
-  artifactBody.textContent = tablets[index];
-  artifactMeta.innerHTML = `<span>${save.data.tablets.length} tablets recovered</span><span>leadership codex</span>`;
+  openDetail(`Architect Tablet ${index + 1}`, 'Recovered Inscription', `<blockquote>${escapeHTML(tablets[index])}</blockquote>${metaPills([`${save.data.tablets.length} tablets recovered`, 'leadership codex'])}`);
 }
 
 function openTrial() {
@@ -352,6 +367,7 @@ function openTrial() {
   trial.reset();
   contactCanvas.classList.add('hidden');
   trialModal.classList.remove('hidden');
+  pauseOverlay.classList.add('hidden');
   renderTrial(trial.snapshot());
 }
 
@@ -410,16 +426,28 @@ async function hydrateRepositories(showToast = true) {
   if (!codexPanel.classList.contains('hidden')) openCodex();
 }
 
+async function loadGalleryData() {
+  try {
+    const response = await fetch('/data/linkedin-gallery.json', { cache: 'no-store' });
+    if (!response.ok) return;
+    const payload = await response.json();
+    if (Array.isArray(payload.items) && payload.items.length) galleryPayload = payload.items;
+  } catch {
+    galleryPayload = linkedinGallery;
+  }
+}
+
 function openCodex() {
   document.exitPointerLock?.();
+  pauseOverlay.classList.add('hidden');
   save.noteCodexOpen();
-  const manifestRows = assetManifest.productionNeeds.map((need) => `<li>${need}</li>`).join('');
+  const manifestRows = assetManifest.productionNeeds.map((need) => `<li>${escapeHTML(need)}</li>`).join('');
   const backendStatus = save.data.backend?.online ? 'online' : 'offline/static';
-  const repoRows = repositoryPayload.map((repo) => `<li><strong>${repo.repo}</strong> — ${repo.title}<br><span>${repo.realm} / ${repo.status} / signal ${repo.signal} / ${repo.language || 'unknown'}</span></li>`).join('');
-  const realmRows = realms.map((realm) => `<article><h3>${realm.name}</h3><p><strong>${realm.title}</strong></p><p>${realm.body}</p><p><span>${realm.plain}</span></p><p><strong>Artifacts:</strong> ${realm.artifacts.map((id) => save.data.discoveredArtifacts.includes(id) ? artifacts[id].title : 'Unknown relic').join(', ')}</p></article>`).join('');
-  const tabletRows = tablets.map((tablet, i) => `<li>${save.data.tablets.includes(i) ? tablet : 'Unrecovered inscription'}</li>`).join('');
-  const galleryRows = linkedinGallery.map((item) => `<article class="gallery-card"><h3>${item.title}</h3><p><strong>${item.category}</strong></p><p>${item.excerpt}</p><p><span>${item.image ? item.image : 'Image slot ready: add exported LinkedIn screenshot or photo asset.'}</span></p><p><a href="${item.url}" target="_blank" rel="noreferrer">Open LinkedIn source</a></p></article>`).join('');
-  codexContent.innerHTML = `<h3>${socialProfile.name}</h3><p><strong>${socialProfile.headline}</strong></p><p>${socialProfile.summary}</p><p><a href="${socialProfile.linkedin}" target="_blank" rel="noreferrer">Open LinkedIn profile</a></p><h3>Progress</h3><p>${save.data.visitedRealms.length}/${realms.length} districts visited. ${save.data.discoveredArtifacts.length}/${Object.keys(artifacts).length} artifacts discovered. ${save.data.tablets.length}/${tablets.length} tablets recovered.</p><h3>Districts</h3>${realmRows}<h3>LinkedIn and Posts Gallery</h3><p>This gallery is wired to ${socialProfile.linkedin}. LinkedIn blocked automated fetching here, so exported screenshots/images should be dropped in as assets next.</p>${galleryRows}<h3>Living Workshop</h3><p>Source: ${world.syncStatus}. Backend: ${backendStatus}. Press Sync Workshop to refresh repository signals.</p><ul>${repoRows}</ul><h3>Production Asset Pipeline</h3><ul>${manifestRows}</ul><h3>Leadership Tablets</h3><ol>${tabletRows}</ol><h3>Achievements</h3><ul>${save.data.achievements.map((id) => `<li><strong>${achievements[id]?.title || id}</strong> — ${achievements[id]?.text || ''}</li>`).join('') || '<li>No achievements yet.</li>'}</ul>`;
+  const repoRows = repositoryPayload.map((repo) => `<li><strong>${escapeHTML(repo.repo)}</strong> — ${escapeHTML(repo.title)}<br><span>${escapeHTML(repo.realm)} / ${escapeHTML(repo.status)} / signal ${escapeHTML(String(repo.signal))} / ${escapeHTML(repo.language || 'unknown')}</span></li>`).join('');
+  const realmRows = realms.map((realm) => `<article><h3>${escapeHTML(realm.name)}</h3><p><strong>${escapeHTML(realm.title)}</strong></p><p>${escapeHTML(realm.body)}</p><p><span>${escapeHTML(realm.plain)}</span></p><p><strong>Artifacts:</strong> ${realm.artifacts.map((id) => save.data.discoveredArtifacts.includes(id) ? escapeHTML(artifacts[id].title) : 'Unknown relic').join(', ')}</p></article>`).join('');
+  const tabletRows = tablets.map((tablet, i) => `<li>${save.data.tablets.includes(i) ? escapeHTML(tablet) : 'Unrecovered inscription'}</li>`).join('');
+  const galleryRows = galleryPayload.map((item) => `<article class="gallery-card">${item.image ? `<img src="${escapeAttribute(item.image)}" alt="${escapeAttribute(item.title)}" loading="lazy">` : ''}<h3>${escapeHTML(item.title)}</h3><p><strong>${escapeHTML(item.category)}</strong></p><p>${escapeHTML(item.excerpt)}</p><p>${linkButton(item.url, 'Open source')}</p></article>`).join('');
+  codexContent.innerHTML = `<h3>${escapeHTML(socialProfile.name)}</h3><p><strong>${escapeHTML(socialProfile.headline)}</strong></p><p>${escapeHTML(socialProfile.summary)}</p><p>${linkButton(socialProfile.linkedin, 'Open LinkedIn profile')}</p><h3>Progress</h3><p>${save.data.visitedRealms.length}/${realms.length} districts visited. ${save.data.discoveredArtifacts.length}/${Object.keys(artifacts).length} artifacts discovered. ${save.data.tablets.length}/${tablets.length} tablets recovered.</p><h3>Districts</h3>${realmRows}<h3>LinkedIn and Posts Gallery</h3><p>Imported gallery cards are loaded from <code>public/data/linkedin-gallery.json</code> when available.</p>${galleryRows}<h3>Living Workshop</h3><p>Source: ${escapeHTML(world.syncStatus)}. Backend: ${backendStatus}. Press Sync Workshop to refresh repository signals.</p><ul>${repoRows}</ul><h3>Production Asset Pipeline</h3><ul>${manifestRows}</ul><h3>Leadership Tablets</h3><ol>${tabletRows}</ol><h3>Achievements</h3><ul>${save.data.achievements.map((id) => `<li><strong>${escapeHTML(achievements[id]?.title || id)}</strong> — ${escapeHTML(achievements[id]?.text || '')}</li>`).join('') || '<li>No achievements yet.</li>'}</ul>`;
   codexPanel.classList.remove('hidden');
 }
 
@@ -486,6 +514,39 @@ function renderMinimap() {
   ctx.fill();
 }
 
+function openDetail(kicker, title, html) {
+  document.exitPointerLock?.();
+  pauseOverlay.classList.add('hidden');
+  artifactPanel.classList.add('hidden');
+  detailKicker.textContent = kicker;
+  detailTitle.textContent = title;
+  detailContent.innerHTML = html;
+  detailPanel.classList.remove('hidden');
+}
+
+function closeDetailPanel() {
+  detailPanel.classList.add('hidden');
+  detailContent.innerHTML = '';
+  lockPointer();
+}
+
+function renderGalleryCard(item, single = false) {
+  return `<article class="detail-gallery-card ${single ? 'single' : ''}">${item.image ? `<img src="${escapeAttribute(item.image)}" alt="${escapeAttribute(item.title)}" loading="lazy">` : '<div class="image-placeholder">Image pending</div>'}<div><p class="eyebrow">${escapeHTML(item.category || 'Post')}</p><h3>${escapeHTML(item.title)}</h3><p>${paragraphs(item.excerpt)}</p>${metaPills([item.age, item.engagement ? `${item.engagement} reactions` : null, item.impressions].filter(Boolean))}<p>${linkButton(item.url, 'Open LinkedIn Post')}</p></div></article>`;
+}
+
+function paragraphs(text = '') {
+  return escapeHTML(text).split('\n').filter(Boolean).map((line) => `<span class="detail-paragraph">${line}</span>`).join('');
+}
+
+function metaPills(values) {
+  return `<div class="artifact-meta">${values.map((value) => `<span>${escapeHTML(value)}</span>`).join('')}</div>`;
+}
+
+function linkButton(url, label) {
+  if (!url || url === '#') return '';
+  return `<a class="detail-link" href="${escapeAttribute(url)}" target="_blank" rel="noreferrer">${escapeHTML(label)}</a>`;
+}
+
 function unlock(id) {
   if (!achievements[id]) return;
   if (save.unlockAchievement(id)) showToastMessage(achievements[id].title, achievements[id].text);
@@ -493,10 +554,15 @@ function unlock(id) {
 
 function showToastMessage(title, text) {
   achievementToast.classList.remove('hidden');
-  achievementToast.innerHTML = `<strong>${title}</strong><span>${text}</span>`;
+  achievementToast.innerHTML = `<strong>${escapeHTML(title)}</strong><span>${escapeHTML(text)}</span>`;
   clearTimeout(showToastMessage.timer);
   showToastMessage.timer = setTimeout(() => achievementToast.classList.add('hidden'), 4200);
 }
 
+function escapeHTML(value = '') {
+  return String(value).replace(/[&<>'"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char]));
+}
+
+function escapeAttribute(value = '') { return escapeHTML(value); }
 function distanceTo(x, z) { return Math.hypot(x - player.x, z - player.z); }
 function clamp(value, min, max) { return Math.max(min, Math.min(max, value)); }
