@@ -3,38 +3,41 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#04070d" />
-  <meta name="description" content="Jeff Barnes immersive 3D portfolio: healthcare analytics, data engineering, AI, leadership, and projects." />
-  <title>Jeff Barnes | Project ODIN Portfolio World</title>
+  <meta name="theme-color" content="#2f2115" />
+  <meta name="description" content="Jeff Barnes Commons immersive portfolio: resume, articles, AI, healthcare analytics, data platforms, leadership, and projects." />
+  <title>Jeff Barnes Commons | Immersive Portfolio</title>
 </head>
 <body>
-  <canvas id="gameCanvas" aria-label="Jeff Barnes immersive WebGL portfolio world"></canvas>
+  <canvas id="gameCanvas" aria-label="Jeff Barnes Commons immersive WebGL portfolio world"></canvas>
 
   <section id="titleScreen" class="title-screen">
     <div class="landing-profile-wrap">
       <img id="profilePortrait" class="profile-portrait" alt="Jeff Barnes profile portrait" />
     </div>
-    <p class="eyebrow">Jeff Barnes / Immersive Portfolio World</p>
+    <p class="eyebrow">Jeff Barnes Commons</p>
     <h1>Jeff Barnes</h1>
-    <p class="subtitle">Explore my projects, leadership philosophy, AI work, data engineering, and healthcare analytics journey inside a first-person 3D world.</p>
-    <p class="identity-line">Senior Director of Business Intelligence, Data Engineering, and AI • Builder of platforms, teams, products, and practical systems</p>
+    <p class="subtitle">Principal Enterprise Architect / Platform Transformation Executive</p>
+    <p class="identity-line">Healthcare analytics • enterprise architecture • data engineering • AI governance • platform modernization • leadership</p>
+    <p class="landing-about">Walk through a storybook fantasy village built around my resume, public writing, projects, AI work, healthcare analytics background, and leadership philosophy.</p>
     <div class="title-actions">
-      <button id="startButton">Explore Jeff's Work</button>
-      <button id="continueButton">Continue Journey</button>
+      <button id="startButton">Enter the Commons</button>
+      <button id="resumeButton">Open Resume</button>
+      <button id="aboutButton">About Me</button>
       <button id="codexButton">Open Codex</button>
     </div>
-    <p class="hint">Mouse-look uses pointer lock. Move with WASD or arrow keys. Mouse wheel zooms. Left-click objects to inspect. Press E as an optional interact shortcut. Press Esc to pause/release mouse.</p>
+    <button id="continueButton" class="continue-hidden">Continue Journey</button>
+    <p class="hint">Mouse-look uses pointer lock. Move with WASD or arrow keys. Mouse wheel zooms. Click named buildings, signs, articles, and artifacts to open full readable panels. Press Esc to release the mouse.</p>
   </section>
 
   <div id="reticle" class="reticle hidden" aria-hidden="true"></div>
-  <div id="interactionPrompt" class="interaction-prompt hidden">Explore Jeff's work. Look at gallery cards, project artifacts, portals, and the Great Gate.</div>
+  <div id="interactionPrompt" class="interaction-prompt hidden">Explore Jeff Barnes Commons. Click named buildings, signs, and article walls.</div>
 
   <aside id="pauseOverlay" class="pause-overlay hidden">
     <p class="eyebrow">Paused</p>
     <h2>Mouse released</h2>
     <p>Click Resume or click the world to re-enter mouse-look.</p>
     <div class="pause-actions">
-      <button id="resumeButton">Resume</button>
+      <button id="resumePointerButton">Resume</button>
       <button id="syncButton">Sync Workshop</button>
       <button id="backendButton">Check Backend</button>
       <button id="cameraButton">Cinematic Beat</button>
@@ -45,12 +48,12 @@
   <aside id="hud" class="hud hidden">
     <div>
       <p class="hud-label">Objective</p>
-      <h2 id="objectiveTitle">Learn about Jeff Barnes</h2>
-      <p id="objectiveText">Start in the Arrival Plaza, then explore projects, posts, AI, data platforms, healthcare analytics, and leadership districts.</p>
+      <h2 id="objectiveTitle">Explore Jeff Barnes Commons</h2>
+      <p id="objectiveText">Start in the Commons, then visit Resume Hall, Chronicle House, The Foundry, AI Workshop, Healthcare Analytics Hall, Leadership Library, and Project Workshop.</p>
     </div>
     <canvas id="minimap" width="220" height="150" aria-label="District minimap"></canvas>
     <div class="hud-row">
-      <span id="realmTag">About Jeff</span>
+      <span id="realmTag">Commons</span>
       <span id="achievementCount">0 achievements</span>
     </div>
   </aside>
@@ -58,8 +61,8 @@
   <aside id="directorPanel" class="director-panel hidden"><p class="eyebrow">Camera Director</p><p id="directorText">Standing by.</p></aside>
 
   <aside id="corvusPanel" class="corvus-panel hidden">
-    <p class="eyebrow">Guide</p>
-    <p id="corvusText">This world is here to introduce Jeff Barnes.</p>
+    <p class="eyebrow">Village Guide</p>
+    <p id="corvusText">Welcome to Jeff Barnes Commons.</p>
   </aside>
 
   <section id="artifactPanel" class="artifact-panel hidden" aria-live="polite">
@@ -82,27 +85,23 @@
 
   <section id="codexPanel" class="codex-panel hidden">
     <button id="closeCodex" class="close-button">Close</button>
-    <h2>Jeff Barnes Codex</h2>
+    <h2>Jeff Barnes Commons Codex</h2>
     <div id="codexContent"></div>
   </section>
 
   <section id="trialModal" class="trial-modal hidden" aria-modal="true" role="dialog">
     <div class="trial-card">
       <button id="closeTrial" class="close-button">Close</button>
-      <p class="eyebrow">Vault of Trust</p>
+      <p class="eyebrow">Contact Tower</p>
       <h2>Contact Jeff Barnes</h2>
       <p>Earn 16 insight while keeping pressure below 11 and stability above 0. The trial is a short interactive gate before the clear contact card appears.</p>
       <div id="trialStats" class="trial-stats"></div>
       <div class="trial-actions"></div>
-      <p id="trialLog" class="trial-log">The vault waits.</p>
+      <p id="trialLog" class="trial-log">The tower waits.</p>
       <canvas id="contactCanvas" width="760" height="260" class="contact-canvas hidden"></canvas>
     </div>
   </section>
 
-  <script type="module">
-    import { jeffProfileImage } from '/src/game/profileImage.js';
-    document.getElementById('profilePortrait').src = jeffProfileImage;
-  </script>
   <script type="module" src="/src/main.js"></script>
 </body>
 </html>
