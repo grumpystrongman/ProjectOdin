@@ -1,22 +1,27 @@
 # Project ODIN: The Architect's Path
 
-Sprint 4 turns Project ODIN into a fullstack‑ready vertical slice with a browser game client, FastAPI backend, server‑issued trust tokens, backend repository sync, and a production deployment path. This bundle bumps the internal version to `0.4.1` and adds an audit trail, documented workshop API endpoint, and user‑respecting accessibility settings.
+Project ODIN is now a full-screen Three.js exploration game instead of a dashboard-style prototype. The frontend keeps the existing FastAPI backend, trust-token/contact gate logic, GitHub repository sync, save state, smoke test, Vite, and Three.js foundation, but the visual and interaction layer has been rebuilt as an immersive ancient-sci-fi world hub.
 
-## Sprint 4 Completed
+The experience is intentionally closer to a small Myst-like discovery space, an Assassin's Creed-style historical hub, and an MMORPG capital-city portfolio world than a normal website.
 
-- FastAPI backend with health, repository sync, trust-token issuance, and contact-token verification endpoints
-  - Added `/api/github/workshop` alias for the repository sync route (the old `/api/github/repositories` remains for backwards compatibility)
-  - Audit log writes `unlock_audit.log` entries on token issuance and contact verification without collecting personal data
-- Frontend backend health check and backend-aware Codex
-- Server-first GitHub sync with public/static fallback
-- Server-issued contact trust token support with local fallback for static hosting
-- Camera Director system for authored cinematic beats
-  - Respect `reduceMotion` and `cinematicCamera` settings in the save state to disable cinematics for accessibility
-- Production asset manifest for art/audio pipeline tracking
-- Expanded persistence schema
-- Updated smoke test and production build validation
-- Fullstack launch helper
-  - Save settings schema now exposes `reduceMotion` and `cinematicCamera` flags for accessibility
+## Current Build
+
+- Full-screen Three.js world with fog, stars, terrain variation, ruins, towers, monoliths, dramatic lighting, shadows, and a glowing data river.
+- Central Great Gate as a physical world object.
+- Realm portals as explorable locations, not dashboard buttons.
+- Physical clickable artifacts, tablets, vault, portals, and gate.
+- Pointer-lock mouse-look controls.
+- WASD movement.
+- Arrow-key movement.
+- Left-click raycast interaction.
+- Optional `E` interaction shortcut.
+- Esc releases pointer lock and opens the pause overlay.
+- Minimal HUD, central reticle, contextual in-world prompt, and clean Codex overlay.
+- Cinematic camera entrance on start.
+- Existing Codex/progress/save-state behavior preserved.
+- Existing GitHub workshop sync preserved.
+- Existing FastAPI backend and trust-token/contact verification flow preserved.
+- Future `.glb` / `.gltf` import support prepared through scene asset anchors and `loadGltfAsset`.
 
 ## Run Frontend
 
@@ -26,6 +31,29 @@ npm run smoke
 npm run dev
 ```
 
+Vite will print the local development URL, usually `http://localhost:5173`.
+
+## Controls
+
+| Action | Control |
+|---|---|
+| Start / lock mouse | Click Enter the World, then click the game canvas |
+| Look around | Mouse |
+| Move | WASD |
+| Move alternate | Arrow keys |
+| Sprint | Hold Shift |
+| Interact | Left-click targeted object |
+| Interact alternate | E |
+| Open Codex | C |
+| Release mouse / pause | Esc |
+| Resume pointer lock | Click Resume or click the world canvas |
+
+## Interaction Model
+
+The player moves through the world in first person. The reticle locks onto physical scene objects using Three.js raycasting. When the player looks at an artifact, tablet, portal, vault, or the Great Gate, a small contextual prompt appears. Left-click inspects or activates that world object.
+
+The Vault of Trust is now an in-world structure. Looking at it and clicking starts the Architect Trial. The existing server-first trust-token verification remains intact, with the static fallback still available when the backend is offline.
+
 ## Run Backend
 
 ```bash
@@ -33,7 +61,7 @@ pip install -r requirements.txt
 npm run backend
 ```
 
-The backend runs at `http://localhost:8011`. For local frontend-to-backend calls through Vite, set a Vite proxy or host the built app behind the FastAPI service in Sprint 5. The client still works in static fallback mode when the backend is not present.
+The backend runs at `http://localhost:8011`. The client still works in static fallback mode when the backend is not present.
 
 ## Run Fullstack Helper
 
@@ -43,6 +71,15 @@ npm install
 npm run fullstack
 ```
 
+## Tests
+
+```bash
+npm run smoke
+npm run build
+```
+
+`npm run smoke` verifies the required backend/frontend files and checks for the immersive controls layer: pointer lock, mouse-look, WASD/arrow movement, raycast interaction, reticle/prompt UI, in-world vault, GitHub sync wiring, and trust-token fallback wiring.
+
 ## Production Direction
 
-Sprint 5 should add the final deployment adapter: FastAPI serves the built Vite app, `/api/*` routes are same-origin, secrets are environment-backed, and GitHub Actions builds and publishes the site.
+Next steps should focus on replacing select procedural primitives with authored `.glb` / `.gltf` assets while preserving the same asset-anchor contract. The current scene intentionally includes `registerAssetAnchor`, `getAssetAnchor`, and `loadGltfAsset` hooks so future imported models can be mounted onto the Great Gate, realm portals, relics, tablets, and vault without rewriting the interaction system.
