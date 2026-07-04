@@ -12,8 +12,10 @@ const required = [
   'src/styles.css',
   'src/game/audio.js',
   'src/game/content.js',
+  'src/game/fantasyArt.js',
   'src/game/githubSync.js',
   'src/game/profileImage.js',
+  'src/game/resumeData.js',
   'src/game/scene3d.js',
   'src/game/state.js',
   'src/game/token.js',
@@ -36,19 +38,27 @@ const scene = fs.readFileSync(path.join(root, 'src/game/scene3d.js'), 'utf8');
 const trial = fs.readFileSync(path.join(root, 'src/game/trial.js'), 'utf8');
 const content = fs.readFileSync(path.join(root, 'src/game/content.js'), 'utf8');
 const profileImage = fs.readFileSync(path.join(root, 'src/game/profileImage.js'), 'utf8');
+const resumeData = fs.readFileSync(path.join(root, 'src/game/resumeData.js'), 'utf8');
+const fantasyArt = fs.readFileSync(path.join(root, 'src/game/fantasyArt.js'), 'utf8');
+const audio = fs.readFileSync(path.join(root, 'src/game/audio.js'), 'utf8');
 const linkedinData = fs.readFileSync(path.join(root, 'public/data/linkedin-gallery.json'), 'utf8');
 
 const checks = [
   ['Three.js scene import', scene.includes("from 'three'")],
   ['OdinScene exported', scene.includes('export class OdinScene')],
-  ['Jeff identity leads the site', index.includes('Jeff Barnes') && index.includes('Explore Jeff')],
-  ['Jeff profile image wired', index.includes('profilePortrait') && index.includes('jeffProfileImage') && profileImage.includes('data:image/jpeg;base64')],
+  ['Jeff Commons identity leads the site', index.includes('Jeff Barnes Commons') && index.includes('Enter the Commons')],
+  ['Resume Hall wired', index.includes('resumeButton') && main.includes('openResumeHall') && resumeData.includes('Principal Enterprise Architect')],
+  ['About Jeff wired', index.includes('aboutButton') && main.includes('openAboutJeff') && resumeData.includes('I build data and AI systems')],
+  ['Fantasy artwork wired', fantasyArt.includes('commonsMap') && main.includes('fantasyArt')],
+  ['Fable-like labeled world present', scene.includes('makeSignBoard') && content.includes('Resume Hall') && content.includes('Chronicle House') && content.includes('Leadership Library')],
+  ['Jeff profile image wired', index.includes('profilePortrait') && main.includes('jeffProfileImage') && profileImage.includes('data:image/jpeg;base64')],
   ['LinkedIn profile wired', content.includes('https://www.linkedin.com/in/cmajeff/') && main.includes('linkedinGallery')],
   ['LinkedIn gallery export present', linkedinData.includes('linkedin-7478760880571088896') && linkedinData.includes('media.licdn.com')],
-  ['Posts gallery district present', content.includes('LinkedIn and Posts Gallery') && content.includes('post-gallery-wall')],
+  ['Full article reader present', main.includes('articleText') && main.includes('Open original article') && main.includes('fullText')],
   ['Readable interaction detail panel present', index.includes('detailPanel') && main.includes('openDetail') && main.includes('closeDetailPanel')],
   ['Detail panel releases pointer lock', main.includes('document.exitPointerLock') && main.includes('detailPanel.classList.remove')],
   ['Gallery images rendered in detail panel', main.includes('renderGalleryCard') && main.includes('<img src=')],
+  ['Warm fantasy audio present', audio.includes('tickMelody') && audio.includes('warm fantasy') || audio.includes('Retune audio') || audio.includes('melodyTimer')],
   ['Pointer lock controls wired', main.includes('requestPointerLock') && main.includes('pointerlockchange')],
   ['Mouse look wired', main.includes('movementX') && main.includes('movementY')],
   ['WASD and arrow movement wired', main.includes("keys.has('w')") && main.includes("keys.has('arrowup')")],
