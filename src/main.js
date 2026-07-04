@@ -54,6 +54,7 @@ const scene = new OdinScene(canvas);
 const director = new CameraDirector();
 const trial = new ArchitectsTrial({ onUpdate: renderTrial, onReveal: handleTrialReveal });
 const keys = new Set();
+const movementKeys = new Set(['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright', 'shift']);
 
 let started = false;
 let activeRealm = null;
@@ -61,12 +62,15 @@ let vaultNear = false;
 let repositoryPayload = save.data.repositoryCache || githubSeeds;
 let lastSaveAt = 0;
 let focusedInteraction = null;
+let worldClickHint = '';
 
 const player = {
   x: save.data.player?.x ?? 0,
   z: save.data.player?.z ?? 1040,
-  yaw: save.data.player?.yaw ?? Math.PI,
-  pitch: save.data.player?.pitch ?? -0.08,
+  yaw: save.data.player?.yaw ?? 0,
+  pitch: save.data.player?.pitch ?? -0.06,
+  fov: save.data.player?.fov ?? 68,
+  headBob: 0,
   vx: 0,
   vz: 0
 };
@@ -82,6 +86,7 @@ document.addEventListener('keyup', (event) => keys.delete(event.key.toLowerCase(
 document.addEventListener('mousemove', onMouseMove);
 document.addEventListener('pointerlockchange', onPointerLockChange);
 canvas.addEventListener('click', onWorldClick);
+canvas.addEventListener('wheel', onMouseWheel, { passive: false });
 
 startButton.addEventListener('click', begin);
 continueButton.addEventListener('click', begin);
@@ -93,7 +98,6 @@ backendButton.addEventListener('click', checkBackend);
 cameraButton.addEventListener('click', () => startCameraBeat('arrival'));
 resetButton.addEventListener('click', () => { save.reset(); window.location.reload(); });
 resumeButton.addEventListener('click', lockPointer);
-
 document.querySelectorAll('[data-trial]').forEach((button) => button.addEventListener('click', () => trial.choose(button.dataset.trial)));
 
 renderMinimap();
@@ -129,9 +133,16 @@ function onPointerLockChange() {
 
 function onMouseMove(event) {
   if (!started || document.pointerLockElement !== canvas) return;
-  player.yaw -= event.movementX * 0.0022;
-  player.pitch -= event.movementY * 0.0022;
-  player.pitch = clamp(player.pitch, -1.18, 1.08);
+  player.yaw -= event.movementX * 0.002;
+  player.pitch -= event.movementY * 0.002;
+  player.pitch = clamp(player.pitch, -1.16, 1.02);
+}
+
+function onMouseWheel(event) {
+  if (!started) return;
+  event.preventDefault();
+  player.fov = clamp(player.fov + Math.sign(event.deltaY) * 4, 42, 84);
+  worldClickHint = player.fov <= 48 ? 'Zoomed in' : player.fov >= 80 ? 'Zoomed out' : 'Mouse wheel zoom adjusted';
 }
 
 function onWorldClick() {
@@ -145,6 +156,7 @@ function onWorldClick() {
 
 function onKeyDown(event) {
   const key = event.key.toLowerCase();
+  if (movementKeys.has(key)) event.preventDefault();
   keys.add(key);
   if (key === 'escape') document.exitPointerLock?.();
   if (key === 'c') openCodex();
@@ -158,7 +170,7 @@ function loop(ts) {
   if (started) update(dt);
   const beat = director.update(ts);
   scene.update({ player, activeRealm, discoveredArtifacts: save.data.discoveredArtifacts, repositories: repositoryPayload, cameraBeat: beat });
-  focusedInteraction = started ? scene.getFocusedInteraction(player, 420) : null;
+  focusedInteraction = started ? scene.getFocusedInteraction(player, 760) : null;
   renderInteractionPrompt();
   renderDirector(beat);
   requestAnimationFrame(loop);
@@ -166,24 +178,31 @@ function loop(ts) {
 
 function update(dt) {
   world.time += dt;
-  const accel = keys.has('shift') ? 1220 : 760;
-  const friction = 0.84;
-  let inputX = 0;
-  let inputZ = 0;
+  const accel = keys.has('shift') ? 1260 : 820;
+  const friction = 0.82;
+  let strafe = 0;
+  let forward = 0;
 
-  if (keys.has('w') || keys.has('arrowup')) inputZ -= 1;
-  if (keys.has('s') || keys.has('arrowdown')) inputZ += 1;
-  if (keys.has('a') || keys.has('arrowleft')) inputX -= 1;
-  if (keys.has('d') || keys.has('arrowright')) inputX += 1;
+  if (keys.has('w') || keys.has('arrowup')) forward += 1;
+  if (keys.has('s') || keys.has('arrowdown')) forward -= 1;
+  if (keys.has('d') || keys.has('arrowright')) strafe += 1;
+  if (keys.has('a') || keys.has('arrowleft')) strafe -= 1;
 
-  if (inputX || inputZ) {
-    const len = Math.hypot(inputX, inputZ) || 1;
-    inputX /= len;
-    inputZ /= len;
+  if (strafe || forward) {
+    const len = Math.hypot(strafe, forward) || 1;
+    strafe /= len;
+    forward /= len;
     const sin = Math.sin(player.yaw);
     const cos = Math.cos(player.yaw);
-    player.vx += (inputX * cos - inputZ * sin) * accel * dt;
-    player.vz += (inputX * sin + inputZ * cos) * accel * dt;
+    const forwardX = -sin;
+    const forwardZ = -cos;
+    const rightX = cos;
+    const rightZ = -sin;
+    player.vx += (rightX * strafe + forwardX * forward) * accel * dt;
+    player.vz += (rightZ * strafe + forwardZ * forward) * accel * dt;
+    player.headBob += dt * (keys.has('shift') ? 16 : 11);
+  } else {
+    player.headBob += (0 - player.headBob) * 0.08;
   }
 
   player.vx *= friction;
@@ -223,7 +242,7 @@ function update(dt) {
 
   updateHud(nearestRealm, nearestRealmDistance);
   if (Date.now() - lastSaveAt > 1500) {
-    save.savePlayer({ x: player.x, z: player.z, yaw: player.yaw, pitch: player.pitch });
+    save.savePlayer({ x: player.x, z: player.z, yaw: player.yaw, pitch: player.pitch, fov: player.fov });
     lastSaveAt = Date.now();
   }
   corvusText.textContent = world.corvusText;
@@ -233,30 +252,38 @@ function update(dt) {
 function interactWithFocused() {
   if (!focusedInteraction) {
     if (vaultNear) openTrial();
+    worldClickHint = 'Nothing selected. Center the reticle on a structure, relic, tablet, portal, river, or terrain feature.';
+    showToastMessage('Exploration Mode', worldClickHint);
     return;
   }
-  const { type, id } = focusedInteraction.userData;
+  const { type, id, label } = focusedInteraction.userData;
   if (type === 'artifact') inspectArtifact(id);
-  if (type === 'tablet') inspectTablet(Number(id));
-  if (type === 'portal') inspectPortal(id);
-  if (type === 'vault') openTrial();
-  if (type === 'gate') showToastMessage('The Great Gate', 'The gate opens wider as artifacts are discovered. The world itself is now the portfolio interface.');
+  else if (type === 'tablet') inspectTablet(Number(id));
+  else if (type === 'portal') inspectPortal(id);
+  else if (type === 'vault') openTrial();
+  else if (type === 'gate') showToastMessage('The Great Gate', 'This is the central threshold into Jeff Barnes’ work, projects, leadership, AI, and healthcare analytics story.');
+  else if (type === 'river') showToastMessage('Glowing Data River', 'The river represents governed data moving through platforms, pipelines, decisions, and people.');
+  else if (type === 'terrain') showToastMessage('Ancient Terrain', 'You are walking through the first build of Jeff’s portfolio world. Paths, districts, and imported assets come next.');
+  else if (type === 'ruin') showToastMessage(label || 'Ancient Structure', 'This structure is part of the world shell. It will become a richer district element as the hub grows.');
+  else showToastMessage(label || 'World Object', 'This object is part of the explorable Project ODIN world.');
 }
 
 function renderInteractionPrompt() {
   if (!started) return;
   if (!focusedInteraction) {
-    interactionPrompt.textContent = vaultNear ? 'Click or press E to enter the Vault of Trust' : 'Explore. Look at relics, tablets, portals, and the Great Gate.';
+    interactionPrompt.textContent = vaultNear ? 'Click or press E to enter the Vault of Trust' : (worldClickHint || 'Explore with mouse-look. WASD/arrows move. Mouse wheel zooms. Center the reticle and click to interact.');
     reticle.classList.remove('locked');
     return;
   }
   const { type, id, label } = focusedInteraction.userData;
   reticle.classList.add('locked');
   if (type === 'artifact') interactionPrompt.textContent = `Click to inspect artifact: ${artifacts[id]?.title || label}`;
-  if (type === 'tablet') interactionPrompt.textContent = `Click to read tablet ${Number(id) + 1}`;
-  if (type === 'portal') interactionPrompt.textContent = `Click to study realm portal: ${realms.find((r) => r.id === id)?.name || label}`;
-  if (type === 'vault') interactionPrompt.textContent = 'Click to enter the Vault of Trust';
-  if (type === 'gate') interactionPrompt.textContent = 'Click to inspect the Great Gate';
+  else if (type === 'tablet') interactionPrompt.textContent = `Click to read tablet ${Number(id) + 1}`;
+  else if (type === 'portal') interactionPrompt.textContent = `Click to study realm portal: ${realms.find((r) => r.id === id)?.name || label}`;
+  else if (type === 'vault') interactionPrompt.textContent = 'Click to enter the Vault of Trust';
+  else if (type === 'gate') interactionPrompt.textContent = 'Click to inspect the Great Gate';
+  else if (type === 'river') interactionPrompt.textContent = 'Click to inspect the glowing data river';
+  else interactionPrompt.textContent = `Click to inspect: ${label || 'world object'}`;
 }
 
 function inspectArtifact(id) {
@@ -414,8 +441,8 @@ function updateHud(nearestRealm = null, distance = null) {
     objectiveText.textContent = 'Look at the vault and click, or press E, to begin the Architect Trial.';
     realmTag.textContent = 'Vault nearby';
   } else {
-    objectiveTitle.textContent = 'Explore the Ancient Data City';
-    objectiveText.textContent = nearestRealm ? `Nearest portal: ${nearestRealm.name}. Distance ${Math.round(distance)}.` : 'Mouse-look, move, and inspect the world.';
+    objectiveTitle.textContent = 'Explore Jeff Barnes’ Project World';
+    objectiveText.textContent = nearestRealm ? `Nearest portal: ${nearestRealm.name}. Distance ${Math.round(distance)}.` : 'Mouse-look, move, zoom, and inspect the world.';
     realmTag.textContent = `${world.syncStatus} workshop`;
   }
 }
