@@ -13,6 +13,7 @@ const required = [
   'src/game/audio.js',
   'src/game/content.js',
   'src/game/githubSync.js',
+  'src/game/profileImage.js',
   'src/game/scene3d.js',
   'src/game/state.js',
   'src/game/token.js',
@@ -34,12 +35,14 @@ const main = fs.readFileSync(path.join(root, 'src/main.js'), 'utf8');
 const scene = fs.readFileSync(path.join(root, 'src/game/scene3d.js'), 'utf8');
 const trial = fs.readFileSync(path.join(root, 'src/game/trial.js'), 'utf8');
 const content = fs.readFileSync(path.join(root, 'src/game/content.js'), 'utf8');
+const profileImage = fs.readFileSync(path.join(root, 'src/game/profileImage.js'), 'utf8');
 const linkedinData = fs.readFileSync(path.join(root, 'public/data/linkedin-gallery.json'), 'utf8');
 
 const checks = [
   ['Three.js scene import', scene.includes("from 'three'")],
   ['OdinScene exported', scene.includes('export class OdinScene')],
   ['Jeff identity leads the site', index.includes('Jeff Barnes') && index.includes('Explore Jeff')],
+  ['Jeff profile image wired', index.includes('profilePortrait') && index.includes('jeffProfileImage') && profileImage.includes('data:image/jpeg;base64')],
   ['LinkedIn profile wired', content.includes('https://www.linkedin.com/in/cmajeff/') && main.includes('linkedinGallery')],
   ['LinkedIn gallery export present', linkedinData.includes('linkedin-7478760880571088896') && linkedinData.includes('media.licdn.com')],
   ['Posts gallery district present', content.includes('LinkedIn and Posts Gallery') && content.includes('post-gallery-wall')],
