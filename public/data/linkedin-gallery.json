@@ -1,0 +1,127 @@
+{
+  "generatedAt": "2026-07-04",
+  "source": "linkedin-2026-07-04.json",
+  "sourceProfile": "https://www.linkedin.com/in/cmajeff/",
+  "items": [
+    {
+      "id": "linkedin-7478760880571088896",
+      "title": "Lately, I have been focusing on creating practical examples of how AI can be integ…",
+      "category": "Data Platform",
+      "image": "https://media.licdn.com/dms/image/v2/D4E22AQHOt_ahQfnSqQ/feedshare-shrink_800/B4EZ8nlYzqJIAc-/0/1783075540490?e=1784764800&v=beta&t=YmytR-7DIkhrHhlIfoz5hxTONM-BOV5tUC1XNyyqQvU",
+      "url": "https://www.linkedin.com/feed/update/urn:li:activity:7478760880571088896/",
+      "excerpt": "Lately, I have been focusing on creating practical examples of how AI can be integrated into analytics workflows. This is not about slides or strategy documents; it's about developing tools that allow users to ask questions and receive answers directly.\n\nOne such example is a Retail Q&A Assistant built using Streamlit and Databricks. The concept is straightforward: a user poses a natural language question related to retail data. The app validates that the question is relevant to retail analytics, employs a Databricks Foundation Model to generate SQL, executes that SQL against Unity Catalog tables, and then presents the results as visualizations or data tables.\n\nWhat I find most significant is not merely the translation from natural language to SQL. Many demos have accomplished that. The more",
+      "age": "1d •",
+      "engagement": "1",
+      "impressions": "140 impressions",
+      "source": "extension-export"
+    },
+    {
+      "id": "linkedin-7478408980470403072",
+      "title": "I think we’ve been centering our data platforms around the wrong thing.",
+      "category": "Data Platform",
+      "image": "https://media.licdn.com/dms/image/v2/D4E22AQGYGRTpC4mHPQ/feedshare-shrink_800/B4EZ8ilVwXHoAg-/0/1782991642043?e=1784764800&v=beta&t=TJ-jN496c_DNE6fmn03hH3rLx9HDkLSplLZMW1eUhlo",
+      "url": "https://www.linkedin.com/feed/update/urn:li:activity:7478408980470403072/",
+      "excerpt": "I think we’ve been centering our data platforms around the wrong thing.\n\nFor years, the database has been the thing we protected, tuned, documented, and celebrated. We invested countless hours optimizing indexes, partitioning tables, reducing query times, and carefully modeling schemas. When someone asked about the health of the platform, we talked about the database.\n\nWorking with Databricks has challenged that way of thinking.\n\nThe database is becoming an implementation detail.\n\nThe real product is the pipeline.\n\nNot just the ingestion, but the entire lifecycle. How data arrives. How it’s validated. How quality checks are enforced. How transformations are versioned. How failures are recovered. How lineage is captured. How the entire process can be recreated six months from now without someone digging through old documentation or trying",
+      "age": "2d •",
+      "engagement": "3",
+      "impressions": "147 impressions",
+      "source": "extension-export"
+    },
+    {
+      "id": "linkedin-7478043622483886081",
+      "title": "Too much of our effort goes into moving data instead of helping people make bett…",
+      "category": "Healthcare Analytics",
+      "image": "https://media.licdn.com/dms/image/v2/D4E22AQF_wyS7PQHnYA/feedshare-shrink_800/B4EZ8dZDC6IkAg-/0/1782904533517?e=1784764800&v=beta&t=v-urmM5650qvGT56M9FUGrUIuwD5PEv0HwamMqJrN-k",
+      "url": "https://www.linkedin.com/feed/update/urn:li:activity:7478043622483886081/",
+      "excerpt": "Too much of our effort goes into moving data instead of helping people make better decisions and that overhead is baked into how enterprise analytics has been built. Data is constantly extracted, transformed, copied, reconciled, validated, modeled, and served across systems, creating complexity that slows everything down.\n\nOver time, I stopped asking whether it was necessary and started asking whether we’d just become comfortable with it.\n\nLook at a typical enterprise architecture diagram. Most of it isn’t solving business problems it’s solving the problems created by moving data. We build pipelines because applications, analytics, and AI all live in different places, each needing its own copy.\n\nThat’s why Lakebase from Databricks caught my attention.\n\nNot because it’s PostgreSQL.\nNot because it’s another database.\n\nBecause it challenges an assumption many of us",
+      "age": "3d • Edited •",
+      "engagement": "6",
+      "impressions": "193 impressions",
+      "source": "extension-export"
+    },
+    {
+      "id": "linkedin-7477756046833352704",
+      "title": "The AI Question No One Wants to Answer: When Do You Stop Renting Intelligence?",
+      "category": "Data Platform",
+      "image": "https://media.licdn.com/dms/image/v2/D4E22AQFndf-aKUGN9w/feedshare-shrink_480/B4EZ8ZTf_yKQAk-/0/1782835970415?e=1784764800&v=beta&t=BQ_FQ3tXWIb-llHxIrCIQi1CMs_-0-P4lJWBnFf6myc",
+      "url": "https://www.linkedin.com/feed/update/urn:li:activity:7477756046833352704/",
+      "excerpt": "The AI Question No One Wants to Answer: When Do You Stop Renting Intelligence?\n\nAt some point, every serious AI conversation is going to shift from “which LLM should we buy?” to “which parts of intelligence do we need to control?”\n\nWe have seen this pattern before with data warehouses, cloud platforms, integration engines, cybersecurity tools, and analytics infrastructure. We start with speed and convenience. Usage spreads. The bill gets real. The data gets sensitive. Workflows become dependent. Then the organization realizes the model is no longer a side feature. It is becoming part of the operating system of the business.\n\nCloud LLMs make sense for many use cases. They move fast, improve constantly, and reduce setup time. For experimentation, uneven demand, and frontier reasoning, cloud APIs are often the right answer.\n\nBut there is a",
+      "age": "4d •",
+      "engagement": "4",
+      "impressions": "180 impressions",
+      "source": "extension-export"
+    },
+    {
+      "id": "linkedin-7477539463318036480",
+      "title": "Every data platform diagram seems to start in the same place.",
+      "category": "Healthcare Analytics",
+      "image": "https://media.licdn.com/dms/image/v2/D4E22AQHMTj7zOiMo1A/feedshare-shrink_800/B4EZ8WOhJhJIAg-/0/1782784332719?e=1784764800&v=beta&t=w8Af9uOqaf-sd4rNPNy_c2p92QGUBZqLotwy_gqk_2Y",
+      "url": "https://www.linkedin.com/feed/update/urn:li:activity:7477539463318036480/",
+      "excerpt": "Every data platform diagram seems to start in the same place.\n\nSources on the left.\nPipelines in the middle.\nDashboards on the right.\n\nIt is technically correct, but it misses the part people actually care about.\n\nTrust.\n\nNo executive has ever stopped me in a hallway to ask how many Spark jobs ran overnight. No operational leader has asked whether the data passed beautifully from Bronze to Silver to Gold. No clinician has ever celebrated a clean medallion architecture.\n\nThey ask a much simpler question:\n\n“Can I trust this number?”\n\nThat is the real journey.\n\nNot from raw to curated.\nNot from lakehouse to warehouse.\nNot from ingestion to visualization.\n\nThe real journey is from uncertainty to confidence.\n\nRaw data says, “Something happened.”\n\nTrusted data says, “We understand what happened, we agree",
+      "age": "4d •",
+      "engagement": "3",
+      "impressions": "240 impressions",
+      "source": "extension-export"
+    },
+    {
+      "id": "linkedin-7476767788804706306",
+      "title": "I read a post this week quoting Aravind Srinivas saying, “The model is no longer…",
+      "category": "Data Platform",
+      "image": "https://media.licdn.com/dms/image/v2/D4E22AQFMaaQqPejH4Q/feedshare-shrink_480/B4EZ8LQrrWHwAg-/0/1782600350789?e=1784764800&v=beta&t=L_Qj1VsgW7qpkW4a4Fgqkj0Z9Kpnf3MGEO8FJQ25dnk",
+      "url": "https://www.linkedin.com/feed/update/urn:li:activity:7476767788804706306/",
+      "excerpt": "I read a post this week quoting Aravind Srinivas saying, “The model is no longer the product.”\n\nMy first reaction was disagreement.\n\nNot because I think he’s wrong. I think the statement is incomplete.\n\nFor the past few years, we’ve been obsessed with comparing models. GPT vs. Claude. Gemini vs. Llama. Every benchmark tries to answer the same question: Which one is better?\n\nBut after spending the last year integrating AI into enterprise workflows, I don’t think that’s the question that matters most anymore.\n\nIn healthcare, nobody walks into my office asking for a better large language model.\n\nThey ask if we can reduce documentation time for clinicians. They ask if we can help analysts find answers faster. They ask if AI can eliminate repetitive work so people can spend more time solving real problems.",
+      "age": "6d •",
+      "engagement": "1",
+      "impressions": "222 impressions",
+      "source": "extension-export"
+    },
+    {
+      "id": "linkedin-7476259851254439936",
+      "title": "I’ve been trying to put a name to something that’s been bothering me for a while…",
+      "category": "Healthcare Analytics",
+      "image": "https://media.licdn.com/dms/image/v2/D4E22AQHXtfvqrPeXbA/feedshare-shrink_800/B4EZ8ECt2fHMAg-/0/1782479249111?e=1784764800&v=beta&t=4TDnlyUzCBPehDWw-4tSqZbec9M2vqIXDqSLoLwZ7V4",
+      "url": "https://www.linkedin.com/feed/update/urn:li:activity:7476259851254439936/",
+      "excerpt": "I’ve been trying to put a name to something that’s been bothering me for a while.\n\nOne of the biggest advances in modern analytics has been data lineage. We can trace where data originated, every transformation it went through, who touched it, and how it eventually found its way into a dashboard. Whether you’re working in Fabric, Databricks, or another modern platform, preserving that lineage has become an expected capability.\n\nBut I’ve started wondering if we’ve been preserving the wrong lineage.\n\nWhat about decision lineage?\n\nData lineage tells us where the data came from. Decision lineage tells us why we trusted it.\n\nThink about what really happens during an investigation. An analyst writes SQL, follows three bad hypotheses before finding the right one, asks an LLM to challenge assumptions, talks with operational leaders, discovers a workflow change",
+      "age": "1w •",
+      "engagement": "1",
+      "impressions": "284 impressions",
+      "source": "extension-export"
+    },
+    {
+      "id": "linkedin-7475928129388220416",
+      "title": "Why doesn’t this number match the other dashboard?",
+      "category": "Healthcare Analytics",
+      "image": "https://media.licdn.com/dms/image/v2/D4E22AQEdR7yrZJPxMw/feedshare-shrink_480/B4EZ7_VBBrKIAg-/0/1782400160282?e=1784764800&v=beta&t=YRjB5JpsCfkH7AyZv8Z5TcrnysqI5pfn6IR9TV7m4j4",
+      "url": "https://www.linkedin.com/feed/update/urn:li:activity:7475928129388220416/",
+      "excerpt": "“Why doesn’t this number match the other dashboard?”\n\nIn healthcare analytics, that question rarely stays technical for long. A service-line leader may be planning staffing. Finance may be closing a month. An operational team may be deciding where access is breaking down for patients. When two dashboards disagree, the problem is not simply that a measure needs fixing. Trust starts to drain out of the decision.\n\nUsually, nobody wrote obviously bad SQL. Two well-intentioned teams simply gave the same business term different meanings.\n\nOne revenue model is built at transaction grain; another comes from a summarized financial view. “Active patient” means one thing in an access dashboard and something else in a population-health analysis. Security is applied in different places. A measure sounds clear until someone asks whether it includes exclusions, reversals, late charges, or a particular reporting",
+      "age": "1w •",
+      "engagement": "3",
+      "impressions": "247 impressions",
+      "source": "extension-export"
+    },
+    {
+      "id": "linkedin-7475567966210711553",
+      "title": "I have been trying to make sense of Microsoft IQ without treating it as another …",
+      "category": "Healthcare Analytics",
+      "image": "https://media.licdn.com/dms/image/v2/D5622AQEhn6B6i83K9Q/feedshare-shrink_800/B56Z76Nc9aGQAk-/0/1782314291344?e=1784764800&v=beta&t=WqZN6MYoBszZig-lQchEY8ZhUfdkS-G-dk4q3yD94SI",
+      "url": "https://www.linkedin.com/feed/update/urn:li:activity:7475567966210711553/",
+      "excerpt": "I have been trying to make sense of Microsoft IQ without treating it as another collection of product names.\n\nThe simplest explanation is that Microsoft is trying to give agents shared enterprise context, rather than making every team rebuild it from scratch.\n\nMicrosoft Fabric is the governed data platform: lakehouse, warehouse, engineering, real-time analytics, data science, governance, and Power BI. In healthcare, it supports enterprise reporting, semantic models, executive dashboards, and operational analytics. It still has to coexist with Epic, Databricks, and the reality that no health system has only one source of truth.\n\nMicrosoft Foundry is where teams build, ground, evaluate, govern, and deploy AI apps and agents. Copilot Studio is where those agents can be created, customized, managed, and published into business workflows.\n\nMicrosoft IQ is the context layer those",
+      "age": "1w •",
+      "engagement": "5",
+      "impressions": "603 impressions",
+      "source": "extension-export"
+    },
+    {
+      "id": "linkedin-7475203164409966592",
+      "title": "I grew up in Southern Indiana, in one of those country places where “go outside”…",
+      "category": "Leadership",
+      "image": "https://media.licdn.com/dms/image/v2/D5622AQEcMi6tpQzaRA/feedshare-shrink_800/B56Z71BqoMIUAg-/0/1782227315527?e=1784764800&v=beta&t=QJ3qJ9h2lhqmSyRWe4Tr8z8djPuymiLFDWSrfyBcWiQ",
+      "url": "https://www.linkedin.com/feed/update/urn:li:activity:7475203164409966592/",
+      "excerpt": "I grew up in Southern Indiana, in one of those country places where “go outside” was not a suggestion. It was the entire summer plan.\n\nIn the summer, I fished. In the fall, I hunted. In between, I explored every creek, field, barn, ditch, pond, and patch of woods that looked like it might contain crawdads, arrowheads, snakes, or trouble.\n\nOne hot afternoon, I was fishing with my brother Scott Barnes and some kids from down the country road. I had a Zebco rod, a worm, and the kind of confidence only a country kid can have when nobody has yet explained reality to him.\n\nI decided I was going to catch the biggest bass in Southern Indiana.\n\nNot a bass.\n\nThe bass.\n\nSo I put a nightcrawler on the hook that looked less like bait and more like it",
+      "age": "1w •",
+      "engagement": "12",
+      "impressions": "557 impressions",
+      "source": "extension-export"
+    }
+  ]
+}
