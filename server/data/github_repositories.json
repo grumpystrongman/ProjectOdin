@@ -1,0 +1,29 @@
+[
+  {
+    "repo": "ThreadlineAI",
+    "title": "Context-aware Windows AI sidecar",
+    "realm": "sanctum",
+    "status": "active",
+    "signal": 97,
+    "language": "C#",
+    "url": "https://github.com/grumpystrongman/ThreadlineAI"
+  },
+  {
+    "repo": "AnalyticsPlatform",
+    "title": "Self-service analytics platform foundation",
+    "realm": "forge",
+    "status": "active",
+    "signal": 91,
+    "language": "Python",
+    "url": "https://github.com/grumpystrongman/AnalyticsPlatform"
+  },
+  {
+    "repo": "OpenAegis",
+    "title": "Trust and defensive AI patterns",
+    "realm": "workshop",
+    "status": "prototype",
+    "signal": 82,
+    "language": "Security",
+    "url": "https://github.com/grumpystrongman/OpenAegis"
+  }
+]

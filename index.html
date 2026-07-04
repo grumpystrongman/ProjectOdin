@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#04070d" />
+  <meta name="description" content="Project ODIN: The Architect's Path, an immersive professional portfolio for Jeff Barnes." />
+  <title>Project ODIN | The Architect's Path</title>
+</head>
+<body>
+  <canvas id="gameCanvas" aria-label="Project ODIN immersive WebGL game world"></canvas>
+
+  <section id="titleScreen" class="title-screen">
+    <div class="sigil"></div>
+    <p class="eyebrow">Project ODIN / Sprint 4</p>
+    <h1>The Architect's Path</h1>
+    <p class="subtitle">Every civilization is built by those who organize chaos.</p>
+    <div class="title-actions">
+      <button id="startButton">Enter the Gate</button>
+      <button id="continueButton">Continue Journey</button>
+      <button id="codexButton">Open Codex</button>
+    </div>
+    <p class="hint">Move with WASD or arrows. Hold Shift to move faster. Approach monoliths, relics, tablets, and the Vault. Press C for Codex. Press E near the Vault. Sprint 4 adds backend services, trust token validation, and cinematic beats.</p>
+  </section>
+
+  <aside id="hud" class="hud hidden">
+    <div>
+      <p class="hud-label">Objective</p>
+      <h2 id="objectiveTitle">Reach the Great Gate</h2>
+      <p id="objectiveText">Walk toward the glowing monoliths. The world will reveal itself through proximity.</p>
+    </div>
+    <canvas id="minimap" width="220" height="150" aria-label="Realm minimap"></canvas>
+    <div class="hud-row">
+      <span id="realmTag">Archive dormant</span>
+      <span id="achievementCount">0 achievements</span>
+    </div>
+    <div class="hud-actions">
+      <button id="syncButton">Sync Workshop</button>
+      <button id="backendButton">Check Backend</button>
+      <button id="cameraButton">Cinematic Beat</button>
+      <button id="resetButton">Reset Save</button>
+    </div>
+  </aside>
+
+  <aside id="directorPanel" class="director-panel hidden"><p class="eyebrow">Camera Director</p><p id="directorText">Standing by.</p></aside>
+
+  <aside id="corvusPanel" class="corvus-panel hidden">
+    <p class="eyebrow">Corvus</p>
+    <p id="corvusText">Corvus waits above the gate.</p>
+  </aside>
+
+  <section id="artifactPanel" class="artifact-panel hidden" aria-live="polite">
+    <p id="artifactRealm" class="artifact-realm"></p>
+    <h2 id="artifactTitle"></h2>
+    <p id="artifactBody"></p>
+    <div id="artifactMeta" class="artifact-meta"></div>
+  </section>
+
+  <section id="achievementToast" class="achievement-toast hidden" aria-live="polite"></section>
+
+  <section id="codexPanel" class="codex-panel hidden">
+    <button id="closeCodex" class="close-button">Close</button>
+    <h2>Codex of the Architect</h2>
+    <div id="codexContent"></div>
+  </section>
+
+  <section id="trialModal" class="trial-modal hidden" aria-modal="true" role="dialog">
+    <div class="trial-card">
+      <button id="closeTrial" class="close-button">Close</button>
+      <p class="eyebrow">Vault of Trust</p>
+      <h2>The Architect's Trial</h2>
+      <p>Earn 16 insight while keeping pressure below 11 and stability above 0. This is the operating tradeoff: speed, reliability, innovation, and governance must all survive contact with reality.</p>
+      <div id="trialStats" class="trial-stats"></div>
+      <div class="trial-actions"></div>
+      <p id="trialLog" class="trial-log">The vault waits.</p>
+      <canvas id="contactCanvas" width="760" height="260" class="contact-canvas hidden"></canvas>
+    </div>
+  </section>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
