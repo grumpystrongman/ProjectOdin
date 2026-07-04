@@ -39,12 +39,16 @@ const checks = [
   ['Pointer lock controls wired', main.includes('requestPointerLock') && main.includes('pointerlockchange')],
   ['Mouse look wired', main.includes('movementX') && main.includes('movementY')],
   ['WASD and arrow movement wired', main.includes("keys.has('w')") && main.includes("keys.has('arrowup')")],
+  ['Arrow keys prevent page scrolling', main.includes('movementKeys') && main.includes('event.preventDefault()')],
+  ['Mouse wheel zoom wired', main.includes("addEventListener('wheel'") && main.includes('onMouseWheel') && scene.includes('this.camera.fov')],
   ['Raycast interaction wired', scene.includes('Raycaster') && scene.includes('getFocusedInteraction')],
+  ['Generic world geometry interactable', scene.includes("type: 'terrain'") && scene.includes("type: 'river'") && scene.includes("type: 'ruin'")],
   ['Reticle present', index.includes('reticle') && index.includes('interactionPrompt')],
   ['In-world vault present', scene.includes("type: 'vault'")],
   ['GLTF future asset hook present', scene.includes('loadGltfAsset')],
   ['GitHub sync wired', main.includes('syncGithubRepositories')],
   ['Trust token fallback wired', trial.includes('createTrustToken')],
+  ['Readable contact card wired', trial.includes('Jeff Barnes') && trial.includes('CONTACT UNLOCKED')],
   ['Minimap present', index.includes('minimap')],
   ['Corvus panel present', index.includes('corvusPanel')]
 ];
