@@ -102,12 +102,14 @@ export class OdinScene {
     const mesh = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color: 0x101720, roughness: 0.94, metalness: 0.05 }));
     mesh.rotation.x = -Math.PI / 2;
     mesh.receiveShadow = true;
+    this.markInteractable(mesh, { type: 'terrain', id: 'ground', label: 'Ancient ground' });
     this.world.add(mesh);
     for (let r = 260; r <= 1100; r += 220) {
       const ring = new THREE.Mesh(new THREE.TorusGeometry(r, 2.2, 8, 220), this.materials.darkMetal);
       ring.rotation.x = Math.PI / 2;
       ring.position.y = this.terrainHeight(0, 0) + 1.5;
       ring.receiveShadow = true;
+      this.markInteractable(ring, { type: 'ruin', id: `path-ring-${r}`, label: 'Ancient pathway ring' });
       this.world.add(ring);
     }
   }
@@ -118,6 +120,7 @@ export class OdinScene {
       new THREE.Vector3(-20, 7, -30), new THREE.Vector3(240, 5, -240), new THREE.Vector3(520, 6, -450), new THREE.Vector3(840, 4, -700)
     ]);
     this.river = new THREE.Mesh(new THREE.TubeGeometry(curve, 150, 13, 16, false), this.materials.water);
+    this.markInteractable(this.river, { type: 'river', id: 'data-river', label: 'Glowing data river' });
     this.world.add(this.river);
     this.riverLight = new THREE.PointLight(0x23dfff, 2.4, 900);
     this.riverLight.position.set(-80, 80, -10);
@@ -216,6 +219,7 @@ export class OdinScene {
       ruin.rotation.y = angle + Math.PI / 7;
       ruin.castShadow = true;
       ruin.receiveShadow = true;
+      this.markInteractable(ruin, { type: 'ruin', id: `realm-ruin-${Math.round(angle * 1000)}`, label: 'Realm ruin' });
       group.add(ruin);
     }
   }
@@ -272,6 +276,7 @@ export class OdinScene {
       stone.rotation.y = Math.random() * Math.PI;
       stone.castShadow = true;
       stone.receiveShadow = true;
+      this.markInteractable(stone, { type: 'ruin', id: `outer-ruin-${i}`, label: 'Ancient ruin' });
       this.world.add(stone);
     }
   }
@@ -306,12 +311,13 @@ export class OdinScene {
     this.interactables.push(object);
   }
 
-  getFocusedInteraction(player, maxDistance = 420) {
+  getFocusedInteraction(player, maxDistance = 760) {
     this.raycaster.setFromCamera(this.center, this.camera);
     this.raycaster.far = maxDistance;
-    const hit = this.raycaster.intersectObjects(this.interactables, false).find((item) => item.object?.userData?.interaction);
-    if (!hit) return null;
-    return { object: hit.object, distance: hit.distance, userData: hit.object.userData.interaction };
+    const hits = this.raycaster.intersectObjects(this.interactables, false);
+    const meaningful = hits.find((item) => item.object?.userData?.interaction && item.distance <= maxDistance);
+    if (!meaningful) return null;
+    return { object: meaningful.object, distance: meaningful.distance, userData: meaningful.object.userData.interaction };
   }
 
   registerAssetAnchor(key, object3d) { this.assetAnchors.set(key, object3d); }
@@ -327,14 +333,18 @@ export class OdinScene {
   update({ player, activeRealm, discoveredArtifacts, repositories, cameraBeat }) {
     const t = this.clock.getElapsedTime();
     const cinematic = cameraBeat?.active ? Math.sin(cameraBeat.progress * Math.PI) : 0;
-    const height = this.terrainHeight(player.x, player.z) + 82;
+    const moving = Math.abs(player.vx) + Math.abs(player.vz) > 3;
+    const bob = moving ? Math.sin(player.headBob) * 2.4 : 0;
+    const height = this.terrainHeight(player.x, player.z) + 76 + bob;
+    this.camera.fov += ((player.fov || 68) - this.camera.fov) * 0.16;
+    this.camera.updateProjectionMatrix();
     if (cinematic > 0.02 && cameraBeat?.active?.id === 'arrival') {
       this.camera.position.set(player.x + Math.sin(t * 0.35) * (260 + 180 * cinematic), height + 110 + 150 * cinematic, player.z + 430 + 160 * cinematic);
       this.camera.lookAt(player.x, height + 24, player.z - 220);
     } else {
-      this.camera.position.x += (player.x - this.camera.position.x) * 0.42;
-      this.camera.position.y += (height - this.camera.position.y) * 0.42;
-      this.camera.position.z += (player.z - this.camera.position.z) * 0.42;
+      this.camera.position.x += (player.x - this.camera.position.x) * 0.5;
+      this.camera.position.y += (height - this.camera.position.y) * 0.5;
+      this.camera.position.z += (player.z - this.camera.position.z) * 0.5;
       this.camera.rotation.y = player.yaw;
       this.camera.rotation.x = player.pitch;
       this.camera.rotation.z = 0;
@@ -373,6 +383,7 @@ export class OdinScene {
     if (!repositories) return;
     while (this.repoObjects.length < repositories.length) {
       const mesh = new THREE.Mesh(new THREE.IcosahedronGeometry(10, 0), new THREE.MeshStandardMaterial({ color: 0x72ffc2, emissive: 0x72ffc2, emissiveIntensity: 0.32, metalness: 0.55, roughness: 0.28 }));
+      this.markInteractable(mesh, { type: 'ruin', id: `repo-signal-${this.repoObjects.length}`, label: 'Repository signal' });
       this.world.add(mesh);
       this.repoObjects.push(mesh);
     }
