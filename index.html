@@ -4,27 +4,28 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#04070d" />
-  <meta name="description" content="Project ODIN: The Architect's Path, an immersive ancient sci-fi 3D portfolio world." />
-  <title>Project ODIN | The Architect's Path</title>
+  <meta name="description" content="Jeff Barnes immersive 3D portfolio: healthcare analytics, data engineering, AI, leadership, and projects." />
+  <title>Jeff Barnes | Project ODIN Portfolio World</title>
 </head>
 <body>
-  <canvas id="gameCanvas" aria-label="Project ODIN immersive WebGL game world"></canvas>
+  <canvas id="gameCanvas" aria-label="Jeff Barnes immersive WebGL portfolio world"></canvas>
 
   <section id="titleScreen" class="title-screen">
     <div class="sigil"></div>
-    <p class="eyebrow">Project ODIN / Immersive World Hub</p>
-    <h1>The Architect's Path</h1>
-    <p class="subtitle">A dark-fantasy, ancient-sci-fi portfolio world where systems, leadership, AI, and healthcare analytics become places you can walk through.</p>
+    <p class="eyebrow">Jeff Barnes / Immersive Portfolio World</p>
+    <h1>Jeff Barnes</h1>
+    <p class="subtitle">Explore my projects, leadership philosophy, AI work, data engineering, and healthcare analytics journey inside a first-person 3D world.</p>
+    <p class="identity-line">Senior Director of Business Intelligence, Data Engineering, and AI • Builder of platforms, teams, products, and practical systems</p>
     <div class="title-actions">
-      <button id="startButton">Enter the World</button>
+      <button id="startButton">Explore Jeff's Work</button>
       <button id="continueButton">Continue Journey</button>
       <button id="codexButton">Open Codex</button>
     </div>
-    <p class="hint">Mouse-look uses pointer lock. Move with WASD or arrow keys. Left-click objects to inspect. Press E as an optional interact shortcut. Press Esc to pause/release mouse.</p>
+    <p class="hint">Mouse-look uses pointer lock. Move with WASD or arrow keys. Mouse wheel zooms. Left-click objects to inspect. Press E as an optional interact shortcut. Press Esc to pause/release mouse.</p>
   </section>
 
   <div id="reticle" class="reticle hidden" aria-hidden="true"></div>
-  <div id="interactionPrompt" class="interaction-prompt hidden">Explore. Look at relics, tablets, portals, and the Great Gate.</div>
+  <div id="interactionPrompt" class="interaction-prompt hidden">Explore Jeff's work. Look at gallery cards, project artifacts, portals, and the Great Gate.</div>
 
   <aside id="pauseOverlay" class="pause-overlay hidden">
     <p class="eyebrow">Paused</p>
@@ -42,12 +43,12 @@
   <aside id="hud" class="hud hidden">
     <div>
       <p class="hud-label">Objective</p>
-      <h2 id="objectiveTitle">Reach the Great Gate</h2>
-      <p id="objectiveText">Walk toward the glowing monoliths. Look at objects and left-click to interact.</p>
+      <h2 id="objectiveTitle">Learn about Jeff Barnes</h2>
+      <p id="objectiveText">Start in the Arrival Plaza, then explore projects, posts, AI, data platforms, healthcare analytics, and leadership districts.</p>
     </div>
-    <canvas id="minimap" width="220" height="150" aria-label="Realm minimap"></canvas>
+    <canvas id="minimap" width="220" height="150" aria-label="District minimap"></canvas>
     <div class="hud-row">
-      <span id="realmTag">Archive dormant</span>
+      <span id="realmTag">About Jeff</span>
       <span id="achievementCount">0 achievements</span>
     </div>
   </aside>
@@ -55,8 +56,8 @@
   <aside id="directorPanel" class="director-panel hidden"><p class="eyebrow">Camera Director</p><p id="directorText">Standing by.</p></aside>
 
   <aside id="corvusPanel" class="corvus-panel hidden">
-    <p class="eyebrow">Corvus</p>
-    <p id="corvusText">Corvus waits above the gate.</p>
+    <p class="eyebrow">Guide</p>
+    <p id="corvusText">This world is here to introduce Jeff Barnes.</p>
   </aside>
 
   <section id="artifactPanel" class="artifact-panel hidden" aria-live="polite">
@@ -70,7 +71,7 @@
 
   <section id="codexPanel" class="codex-panel hidden">
     <button id="closeCodex" class="close-button">Close</button>
-    <h2>Codex of the Architect</h2>
+    <h2>Jeff Barnes Codex</h2>
     <div id="codexContent"></div>
   </section>
 
@@ -78,8 +79,8 @@
     <div class="trial-card">
       <button id="closeTrial" class="close-button">Close</button>
       <p class="eyebrow">Vault of Trust</p>
-      <h2>The Architect's Trial</h2>
-      <p>Earn 16 insight while keeping pressure below 11 and stability above 0. This is the operating tradeoff: speed, reliability, innovation, and governance must all survive contact with reality.</p>
+      <h2>Contact Jeff Barnes</h2>
+      <p>Earn 16 insight while keeping pressure below 11 and stability above 0. The trial is a short interactive gate before the clear contact card appears.</p>
       <div id="trialStats" class="trial-stats"></div>
       <div class="trial-actions"></div>
       <p id="trialLog" class="trial-log">The vault waits.</p>
