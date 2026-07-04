@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#04070d" />
-  <meta name="description" content="Project ODIN: The Architect's Path, an immersive professional portfolio for Jeff Barnes." />
+  <meta name="description" content="Project ODIN: The Architect's Path, an immersive ancient sci-fi 3D portfolio world." />
   <title>Project ODIN | The Architect's Path</title>
 </head>
 <body>
@@ -12,33 +12,43 @@
 
   <section id="titleScreen" class="title-screen">
     <div class="sigil"></div>
-    <p class="eyebrow">Project ODIN / Sprint 4</p>
+    <p class="eyebrow">Project ODIN / Immersive World Hub</p>
     <h1>The Architect's Path</h1>
-    <p class="subtitle">Every civilization is built by those who organize chaos.</p>
+    <p class="subtitle">A dark-fantasy, ancient-sci-fi portfolio world where systems, leadership, AI, and healthcare analytics become places you can walk through.</p>
     <div class="title-actions">
-      <button id="startButton">Enter the Gate</button>
+      <button id="startButton">Enter the World</button>
       <button id="continueButton">Continue Journey</button>
       <button id="codexButton">Open Codex</button>
     </div>
-    <p class="hint">Move with WASD or arrows. Hold Shift to move faster. Approach monoliths, relics, tablets, and the Vault. Press C for Codex. Press E near the Vault. Sprint 4 adds backend services, trust token validation, and cinematic beats.</p>
+    <p class="hint">Mouse-look uses pointer lock. Move with WASD or arrow keys. Left-click objects to inspect. Press E as an optional interact shortcut. Press Esc to pause/release mouse.</p>
   </section>
+
+  <div id="reticle" class="reticle hidden" aria-hidden="true"></div>
+  <div id="interactionPrompt" class="interaction-prompt hidden">Explore. Look at relics, tablets, portals, and the Great Gate.</div>
+
+  <aside id="pauseOverlay" class="pause-overlay hidden">
+    <p class="eyebrow">Paused</p>
+    <h2>Mouse released</h2>
+    <p>Click Resume or click the world to re-enter mouse-look.</p>
+    <div class="pause-actions">
+      <button id="resumeButton">Resume</button>
+      <button id="syncButton">Sync Workshop</button>
+      <button id="backendButton">Check Backend</button>
+      <button id="cameraButton">Cinematic Beat</button>
+      <button id="resetButton">Reset Save</button>
+    </div>
+  </aside>
 
   <aside id="hud" class="hud hidden">
     <div>
       <p class="hud-label">Objective</p>
       <h2 id="objectiveTitle">Reach the Great Gate</h2>
-      <p id="objectiveText">Walk toward the glowing monoliths. The world will reveal itself through proximity.</p>
+      <p id="objectiveText">Walk toward the glowing monoliths. Look at objects and left-click to interact.</p>
     </div>
     <canvas id="minimap" width="220" height="150" aria-label="Realm minimap"></canvas>
     <div class="hud-row">
       <span id="realmTag">Archive dormant</span>
       <span id="achievementCount">0 achievements</span>
-    </div>
-    <div class="hud-actions">
-      <button id="syncButton">Sync Workshop</button>
-      <button id="backendButton">Check Backend</button>
-      <button id="cameraButton">Cinematic Beat</button>
-      <button id="resetButton">Reset Save</button>
     </div>
   </aside>
 
