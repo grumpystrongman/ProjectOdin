@@ -1,5 +1,5 @@
 import './styles.css';
-import { realms, artifacts, tablets, corvusLines, achievements, githubSeeds } from './game/content.js';
+import { realms, artifacts, tablets, corvusLines, achievements, githubSeeds, socialProfile, linkedinGallery } from './game/content.js';
 import { ArchitectsTrial, renderContactGlyphs } from './game/trial.js';
 import { SaveState } from './game/state.js';
 import { AdaptiveAudio } from './game/audio.js';
@@ -77,7 +77,7 @@ const player = {
 
 const world = {
   time: 0,
-  corvusText: 'Corvus waits above the gate.',
+  corvusText: `This world is here to introduce ${socialProfile.name}.`,
   syncStatus: save.data.repositoryCache ? 'cached' : 'seeded'
 };
 
@@ -252,34 +252,36 @@ function update(dt) {
 function interactWithFocused() {
   if (!focusedInteraction) {
     if (vaultNear) openTrial();
-    worldClickHint = 'Nothing selected. Center the reticle on a structure, relic, tablet, portal, river, or terrain feature.';
+    worldClickHint = 'Nothing selected. Center the reticle on a structure, relic, tablet, portal, river, gallery card, or terrain feature.';
     showToastMessage('Exploration Mode', worldClickHint);
     return;
   }
   const { type, id, label } = focusedInteraction.userData;
   if (type === 'artifact') inspectArtifact(id);
+  else if (type === 'galleryPost') showGalleryPost(id);
   else if (type === 'tablet') inspectTablet(Number(id));
   else if (type === 'portal') inspectPortal(id);
   else if (type === 'vault') openTrial();
-  else if (type === 'gate') showToastMessage('The Great Gate', 'This is the central threshold into Jeff Barnes’ work, projects, leadership, AI, and healthcare analytics story.');
+  else if (type === 'gate') showToastMessage('The Great Gate', `This is the central threshold into ${socialProfile.name}'s work, projects, leadership, AI, and healthcare analytics story.`);
   else if (type === 'river') showToastMessage('Glowing Data River', 'The river represents governed data moving through platforms, pipelines, decisions, and people.');
-  else if (type === 'terrain') showToastMessage('Ancient Terrain', 'You are walking through the first build of Jeff’s portfolio world. Paths, districts, and imported assets come next.');
-  else if (type === 'ruin') showToastMessage(label || 'Ancient Structure', 'This structure is part of the world shell. It will become a richer district element as the hub grows.');
-  else showToastMessage(label || 'World Object', 'This object is part of the explorable Project ODIN world.');
+  else if (type === 'terrain') showToastMessage('Ancient Terrain', `You are walking through ${socialProfile.name}'s first-person portfolio world. Paths, districts, and imported assets come next.`);
+  else if (type === 'ruin') showToastMessage(label || 'Ancient Structure', 'This structure is part of the grounded world shell. It will become a richer district element as the hub grows.');
+  else showToastMessage(label || 'World Object', `This object is part of ${socialProfile.name}'s explorable Project ODIN world.`);
 }
 
 function renderInteractionPrompt() {
   if (!started) return;
   if (!focusedInteraction) {
-    interactionPrompt.textContent = vaultNear ? 'Click or press E to enter the Vault of Trust' : (worldClickHint || 'Explore with mouse-look. WASD/arrows move. Mouse wheel zooms. Center the reticle and click to interact.');
+    interactionPrompt.textContent = vaultNear ? 'Click or press E to enter the Vault of Trust' : (worldClickHint || `Explore ${socialProfile.name}'s world. WASD/arrows move. Mouse wheel zooms. Center the reticle and click to interact.`);
     reticle.classList.remove('locked');
     return;
   }
   const { type, id, label } = focusedInteraction.userData;
   reticle.classList.add('locked');
-  if (type === 'artifact') interactionPrompt.textContent = `Click to inspect artifact: ${artifacts[id]?.title || label}`;
+  if (type === 'artifact') interactionPrompt.textContent = `Click to inspect: ${artifacts[id]?.title || label}`;
+  else if (type === 'galleryPost') interactionPrompt.textContent = `Click to view gallery card: ${linkedinGallery.find((item) => item.id === id)?.title || label}`;
   else if (type === 'tablet') interactionPrompt.textContent = `Click to read tablet ${Number(id) + 1}`;
-  else if (type === 'portal') interactionPrompt.textContent = `Click to study realm portal: ${realms.find((r) => r.id === id)?.name || label}`;
+  else if (type === 'portal') interactionPrompt.textContent = `Click to study district: ${realms.find((r) => r.id === id)?.name || label}`;
   else if (type === 'vault') interactionPrompt.textContent = 'Click to enter the Vault of Trust';
   else if (type === 'gate') interactionPrompt.textContent = 'Click to inspect the Great Gate';
   else if (type === 'river') interactionPrompt.textContent = 'Click to inspect the glowing data river';
@@ -311,7 +313,7 @@ function inspectPortal(id) {
   if (!realm) return;
   save.visitRealm(id);
   activeRealm = id;
-  showToastMessage(realm.name, realm.quest);
+  showToastMessage(realm.name, realm.plain || realm.quest);
   updateHud(realm, 0);
 }
 
@@ -322,8 +324,19 @@ function showArtifact(id) {
   artifactRealm.textContent = `${realm.name} / ${artifact.type}`;
   artifactTitle.textContent = artifact.title;
   artifactBody.textContent = artifact.body;
-  artifactMeta.innerHTML = `<span>${save.data.discoveredArtifacts.length} artifacts</span><span>${save.data.visitedRealms.length} realms</span><span>${world.syncStatus} workshop</span>`;
+  artifactMeta.innerHTML = `<span>${save.data.discoveredArtifacts.length} artifacts</span><span>${save.data.visitedRealms.length} districts</span><span>${world.syncStatus} workshop</span>`;
   updateHud(realm, 0);
+}
+
+function showGalleryPost(id) {
+  const item = linkedinGallery.find((post) => post.id === id);
+  if (!item) return;
+  artifactPanel.classList.remove('hidden');
+  artifactRealm.textContent = `LinkedIn and Posts Gallery / ${item.category}`;
+  artifactTitle.textContent = item.title;
+  artifactBody.textContent = item.excerpt;
+  artifactMeta.innerHTML = `<span>LinkedIn source wired</span><span>${item.image ? 'image ready' : 'awaiting exported image'}</span><span><a href="${item.url}" target="_blank" rel="noreferrer">Open LinkedIn</a></span>`;
+  showToastMessage('Gallery Card', `${item.title} is wired to LinkedIn. Add exported post screenshots to turn this into a visual gallery.`);
 }
 
 function showTablet(index) {
@@ -403,9 +416,10 @@ function openCodex() {
   const manifestRows = assetManifest.productionNeeds.map((need) => `<li>${need}</li>`).join('');
   const backendStatus = save.data.backend?.online ? 'online' : 'offline/static';
   const repoRows = repositoryPayload.map((repo) => `<li><strong>${repo.repo}</strong> — ${repo.title}<br><span>${repo.realm} / ${repo.status} / signal ${repo.signal} / ${repo.language || 'unknown'}</span></li>`).join('');
-  const realmRows = realms.map((realm) => `<article><h3>${realm.name}</h3><p>${realm.body}</p><p><strong>Artifacts:</strong> ${realm.artifacts.map((id) => save.data.discoveredArtifacts.includes(id) ? artifacts[id].title : 'Unknown relic').join(', ')}</p></article>`).join('');
+  const realmRows = realms.map((realm) => `<article><h3>${realm.name}</h3><p><strong>${realm.title}</strong></p><p>${realm.body}</p><p><span>${realm.plain}</span></p><p><strong>Artifacts:</strong> ${realm.artifacts.map((id) => save.data.discoveredArtifacts.includes(id) ? artifacts[id].title : 'Unknown relic').join(', ')}</p></article>`).join('');
   const tabletRows = tablets.map((tablet, i) => `<li>${save.data.tablets.includes(i) ? tablet : 'Unrecovered inscription'}</li>`).join('');
-  codexContent.innerHTML = `<h3>Progress</h3><p>${save.data.visitedRealms.length}/${realms.length} realms visited. ${save.data.discoveredArtifacts.length}/${Object.keys(artifacts).length} artifacts discovered. ${save.data.tablets.length}/${tablets.length} tablets recovered.</p><h3>Realms</h3>${realmRows}<h3>Living Workshop</h3><p>Source: ${world.syncStatus}. Backend: ${backendStatus}. Press Sync Workshop to refresh repository signals.</p><ul>${repoRows}</ul><h3>Production Asset Pipeline</h3><ul>${manifestRows}</ul><h3>Leadership Tablets</h3><ol>${tabletRows}</ol><h3>Achievements</h3><ul>${save.data.achievements.map((id) => `<li><strong>${achievements[id]?.title || id}</strong> — ${achievements[id]?.text || ''}</li>`).join('') || '<li>No achievements yet.</li>'}</ul>`;
+  const galleryRows = linkedinGallery.map((item) => `<article class="gallery-card"><h3>${item.title}</h3><p><strong>${item.category}</strong></p><p>${item.excerpt}</p><p><span>${item.image ? item.image : 'Image slot ready: add exported LinkedIn screenshot or photo asset.'}</span></p><p><a href="${item.url}" target="_blank" rel="noreferrer">Open LinkedIn source</a></p></article>`).join('');
+  codexContent.innerHTML = `<h3>${socialProfile.name}</h3><p><strong>${socialProfile.headline}</strong></p><p>${socialProfile.summary}</p><p><a href="${socialProfile.linkedin}" target="_blank" rel="noreferrer">Open LinkedIn profile</a></p><h3>Progress</h3><p>${save.data.visitedRealms.length}/${realms.length} districts visited. ${save.data.discoveredArtifacts.length}/${Object.keys(artifacts).length} artifacts discovered. ${save.data.tablets.length}/${tablets.length} tablets recovered.</p><h3>Districts</h3>${realmRows}<h3>LinkedIn and Posts Gallery</h3><p>This gallery is wired to ${socialProfile.linkedin}. LinkedIn blocked automated fetching here, so exported screenshots/images should be dropped in as assets next.</p>${galleryRows}<h3>Living Workshop</h3><p>Source: ${world.syncStatus}. Backend: ${backendStatus}. Press Sync Workshop to refresh repository signals.</p><ul>${repoRows}</ul><h3>Production Asset Pipeline</h3><ul>${manifestRows}</ul><h3>Leadership Tablets</h3><ol>${tabletRows}</ol><h3>Achievements</h3><ul>${save.data.achievements.map((id) => `<li><strong>${achievements[id]?.title || id}</strong> — ${achievements[id]?.text || ''}</li>`).join('') || '<li>No achievements yet.</li>'}</ul>`;
   codexPanel.classList.remove('hidden');
 }
 
@@ -434,15 +448,15 @@ function updateHud(nearestRealm = null, distance = null) {
   if (activeRealm) {
     const realm = realms.find((r) => r.id === activeRealm);
     objectiveTitle.textContent = realm.quest;
-    objectiveText.textContent = `${realm.short} signal active. Look for its physical relics.`;
+    objectiveText.textContent = realm.plain || `${realm.short} signal active. Look for its physical relics.`;
     realmTag.textContent = `${realm.short} active`;
   } else if (vaultNear) {
-    objectiveTitle.textContent = 'Open the Vault of Trust';
-    objectiveText.textContent = 'Look at the vault and click, or press E, to begin the Architect Trial.';
+    objectiveTitle.textContent = `Contact ${socialProfile.name}`;
+    objectiveText.textContent = 'Look at the vault and click, or press E, to begin the short contact-gate trial.';
     realmTag.textContent = 'Vault nearby';
   } else {
-    objectiveTitle.textContent = 'Explore Jeff Barnes’ Project World';
-    objectiveText.textContent = nearestRealm ? `Nearest portal: ${nearestRealm.name}. Distance ${Math.round(distance)}.` : 'Mouse-look, move, zoom, and inspect the world.';
+    objectiveTitle.textContent = `Explore ${socialProfile.name}'s Work`;
+    objectiveText.textContent = nearestRealm ? `Nearest district: ${nearestRealm.name}. Distance ${Math.round(distance)}.` : 'Mouse-look, move, zoom, and inspect the world.';
     realmTag.textContent = `${world.syncStatus} workshop`;
   }
 }
