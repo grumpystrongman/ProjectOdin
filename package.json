@@ -10,8 +10,7 @@
     "preview": "vite preview",
     "smoke": "node scripts/smoke-test.mjs",
     "backend": "uvicorn server.app.main:app --reload --port 8011",
-    "fullstack": "python scripts/run_fullstack.py",
-    "import:social": "node scripts/import-social-gallery.mjs"
+    "fullstack": "python scripts/run_fullstack.py"
   },
   "dependencies": {
     "vite": "^5.4.0",
