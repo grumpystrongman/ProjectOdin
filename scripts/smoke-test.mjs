@@ -36,6 +36,13 @@ const trial = fs.readFileSync(path.join(root, 'src/game/trial.js'), 'utf8');
 const checks = [
   ['Three.js scene import', scene.includes("from 'three'")],
   ['OdinScene exported', scene.includes('export class OdinScene')],
+  ['Pointer lock controls wired', main.includes('requestPointerLock') && main.includes('pointerlockchange')],
+  ['Mouse look wired', main.includes('movementX') && main.includes('movementY')],
+  ['WASD and arrow movement wired', main.includes("keys.has('w')") && main.includes("keys.has('arrowup')")],
+  ['Raycast interaction wired', scene.includes('Raycaster') && scene.includes('getFocusedInteraction')],
+  ['Reticle present', index.includes('reticle') && index.includes('interactionPrompt')],
+  ['In-world vault present', scene.includes("type: 'vault'")],
+  ['GLTF future asset hook present', scene.includes('loadGltfAsset')],
   ['GitHub sync wired', main.includes('syncGithubRepositories')],
   ['Trust token fallback wired', trial.includes('createTrustToken')],
   ['Minimap present', index.includes('minimap')],
@@ -49,4 +56,4 @@ if (failed.length) {
   process.exit(1);
 }
 
-console.log('Project ODIN Sprint 4 smoke test passed.');
+console.log('Project ODIN immersive frontend smoke test passed.');
