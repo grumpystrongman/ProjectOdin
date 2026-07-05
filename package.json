@@ -5,6 +5,7 @@
   "type": "module",
   "description": "Immersive game-like professional portfolio prototype for Jeff Barnes.",
   "scripts": {
+    "assets": "node scripts/download-free-assets.mjs",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
