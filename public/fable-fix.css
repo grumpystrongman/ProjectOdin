@@ -1,0 +1,106 @@
+/* Emergency Fable-pass overrides: this file is intentionally loaded after the Vite app CSS. */
+
+.title-screen {
+  overflow: hidden;
+  isolation: isolate;
+  background:
+    radial-gradient(circle at 50% 32%, rgba(248, 220, 139, .24), transparent 22rem),
+    linear-gradient(180deg, rgba(16, 10, 5, .08), rgba(18, 10, 4, .94) 58%, #090704 100%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1800 1000'%3E%3Cdefs%3E%3ClinearGradient id='sky' x1='0' x2='0' y1='0' y2='1'%3E%3Cstop stop-color='%237f6442'/%3E%3Cstop offset='.45' stop-color='%233b2612'/%3E%3Cstop offset='1' stop-color='%23080704'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='1800' height='1000' fill='url(%23sky)'/%3E%3Ccircle cx='1240' cy='230' r='150' fill='%23e2ba63' opacity='.35'/%3E%3Cpath d='M0 650 C250 520 410 610 600 500 C790 390 980 610 1180 470 C1380 330 1560 490 1800 420 L1800 1000 L0 1000Z' fill='%230e1608' opacity='.88'/%3E%3Cg fill='%2326170b'%3E%3Cpath d='M160 575h130v250H160z M145 575l80-85 80 85z'/%3E%3Cpath d='M400 535h170v300H400z M370 535l115-120 115 120z'/%3E%3Cpath d='M680 580h150v255H680z M655 580l100-100 100 100z'/%3E%3Cpath d='M1010 510h190v330h-190z M980 510l125-130 125 130z'/%3E%3Cpath d='M1340 555h160v285h-160z M1310 555l110-115 110 115z'/%3E%3C/g%3E%3Cg fill='%23543a1d' opacity='.86'%3E%3Crect x='70' y='760' width='1660' height='34'/%3E%3Cpath d='M0 780h1800v220H0z' fill='%230b1007'/%3E%3C/g%3E%3C/svg%3E") center/cover no-repeat !important;
+}
+
+.title-screen::before {
+  content: "";
+  position: absolute;
+  inset: 5vh 9vw;
+  z-index: -1;
+  border: 3px solid rgba(240, 194, 111, .46);
+  border-radius: 28px;
+  background:
+    linear-gradient(145deg, rgba(73, 39, 14, .78), rgba(22, 12, 5, .86)),
+    radial-gradient(circle at 20% 15%, rgba(240, 194, 111, .18), transparent 28rem);
+  box-shadow: 0 35px 120px rgba(0, 0, 0, .72), inset 0 0 80px rgba(240, 194, 111, .08);
+}
+
+.title-screen::after {
+  content: "";
+  position: absolute;
+  left: 7vw;
+  right: 7vw;
+  bottom: 4vh;
+  height: 22vh;
+  z-index: -1;
+  background: linear-gradient(180deg, transparent, rgba(5, 4, 2, .92));
+}
+
+.title-screen h1 {
+  text-shadow: 0 7px 0 rgba(48, 22, 5, .45), 0 0 34px rgba(0, 0, 0, .72);
+  color: #fff0bf;
+}
+
+.landing-profile-wrap {
+  display: none !important;
+}
+
+.title-screen .eyebrow {
+  margin-top: 4vh;
+}
+
+.title-actions button,
+.pause-actions button,
+.trial-actions button {
+  box-shadow: inset 0 1px 0 rgba(255, 238, 184, .24), 0 8px 22px rgba(0, 0, 0, .35);
+}
+
+.interaction-prompt {
+  font-size: 1rem;
+  background: rgba(32, 18, 8, .86);
+  border-color: rgba(240, 194, 111, .66);
+  box-shadow: 0 12px 38px rgba(0, 0, 0, .45);
+}
+
+.reticle.locked {
+  transform: translate(-50%, -50%) scale(1.28);
+  box-shadow: 0 0 18px rgba(240, 194, 111, .8);
+}
+
+.detail-card {
+  background:
+    linear-gradient(145deg, rgba(55, 30, 12, .98), rgba(16, 9, 4, .98)),
+    radial-gradient(circle at 16% 10%, rgba(240, 194, 111, .14), transparent 24rem);
+}
+
+.detail-gallery-card.single {
+  grid-template-columns: minmax(320px, 40%) 1fr;
+}
+
+.detail-gallery-card.single > img,
+.detail-gallery-card.single > .image-placeholder {
+  display: none !important;
+}
+
+.detail-gallery-card.single::before {
+  content: "";
+  min-height: 460px;
+  border: 1px solid rgba(240, 194, 111, .46);
+  border-radius: 14px;
+  background:
+    linear-gradient(180deg, rgba(18, 10, 5, .08), rgba(18, 10, 5, .58)),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 900 1200'%3E%3Crect width='900' height='1200' fill='%23130b05'/%3E%3Ccircle cx='655' cy='190' r='150' fill='%23d5a24c' opacity='.22'/%3E%3Cpath d='M0 780 C170 660 300 715 430 630 C610 515 710 650 900 540 L900 1200 L0 1200Z' fill='%230c1207'/%3E%3Cpath d='M250 430 h400 l-40 465 h-320z' fill='%232e1708' stroke='%23d9b160' stroke-width='8'/%3E%3Cpath d='M300 500 h300 l-25 320 h-250z' fill='%23cda969'/%3E%3Cpath d='M330 565 h240 M330 625 h240 M330 685 h210 M330 745 h180' stroke='%23593216' stroke-width='13' stroke-linecap='round'/%3E%3Ccircle cx='450' cy='275' r='70' fill='%23d7c1a3'/%3E%3Cpath d='M320 430 C340 315 560 315 580 430z' fill='%23622612'/%3E%3Cpath d='M292 410 C260 520 250 650 285 820 L345 820 C320 625 330 515 370 430z' fill='%23712b16'/%3E%3Cpath d='M608 410 C640 520 650 650 615 820 L555 820 C580 625 570 515 530 430z' fill='%23712b16'/%3E%3Cpath d='M215 910 h470 v70 h-470z' fill='%23220f06' stroke='%23d9b160' stroke-width='6'/%3E%3Ctext x='450' y='960' text-anchor='middle' font-family='Georgia' font-size='42' fill='%23f4dfaa'%3EChronicle Herald%3C/text%3E%3C/svg%3E") center/cover no-repeat;
+  box-shadow: inset 0 0 60px rgba(0, 0, 0, .45), 0 20px 60px rgba(0, 0, 0, .36);
+}
+
+.detail-gallery-card img {
+  filter: sepia(.22) contrast(1.05) saturate(.8) brightness(.78);
+}
+
+.hud, .corvus-panel, .director-panel, .artifact-panel, .pause-overlay, .achievement-toast {
+  background: rgba(37, 22, 9, .9);
+  border-color: rgba(240, 194, 111, .58);
+}
+
+@media (max-width: 760px) {
+  .detail-gallery-card.single::before {
+    min-height: 340px;
+  }
+}
