@@ -7,7 +7,7 @@ import { projectShowcase } from './game/projectShowcase.js';
 import { ArchitectsTrial, renderContactGlyphs } from './game/trial.js';
 import { SaveState } from './game/state.js';
 import { AdaptiveAudio } from './game/audio.js';
-import { OdinScene } from './game/scene3d.js';
+import { WorldPassScene } from './game/worldPassScene.js';
 import { syncGithubRepositories } from './game/githubSync.js';
 import { fetchBackendHealth, verifyContactToken } from './game/apiClient.js';
 import { CameraDirector } from './game/cameraDirector.js';
@@ -63,7 +63,7 @@ profilePortrait?.addEventListener('error', () => { profilePortrait.src = fallbac
 
 const save = new SaveState();
 const audio = new AdaptiveAudio();
-const scene = new OdinScene(canvas);
+const scene = new WorldPassScene(canvas);
 const director = new CameraDirector();
 const trial = new ArchitectsTrial({ onUpdate: renderTrial, onReveal: handleTrialReveal });
 const keys = new Set();
@@ -78,6 +78,7 @@ let lastSaveAt = 0;
 let focusedInteraction = null;
 let worldClickHint = '';
 let musicStarted = false;
+let navTarget = null;
 
 const player = { x: save.data.player?.x ?? 0, z: save.data.player?.z ?? 1040, yaw: save.data.player?.yaw ?? 0, pitch: save.data.player?.pitch ?? -0.05, fov: save.data.player?.fov ?? 66, headBob: 0, vx: 0, vz: 0 };
 const world = { time: 0, corvusText: `Welcome to ${socialProfile.name} Commons.`, syncStatus: save.data.repositoryCache ? 'cached' : 'seeded' };
@@ -87,6 +88,7 @@ document.addEventListener('keyup', (event) => keys.delete(event.key.toLowerCase(
 document.addEventListener('mousemove', onMouseMove);
 document.addEventListener('pointerlockchange', onPointerLockChange);
 canvas.addEventListener('click', onWorldClick);
+canvas.addEventListener('contextmenu', (event) => event.preventDefault());
 canvas.addEventListener('wheel', onMouseWheel, { passive: false });
 startButton?.addEventListener('click', begin);
 continueButton?.addEventListener('click', begin);
@@ -138,29 +140,69 @@ function lockPointer() { if (!started || !codexPanel.classList.contains('hidden'
 function onPointerLockChange() { const locked = document.pointerLockElement === canvas; const contentOpen = !detailPanel.classList.contains('hidden') || !codexPanel.classList.contains('hidden') || !trialModal.classList.contains('hidden'); pauseOverlay.classList.toggle('hidden', locked || !started || contentOpen); reticle.classList.toggle('paused', !locked); }
 function onMouseMove(event) { if (!started || document.pointerLockElement !== canvas) return; player.yaw -= event.movementX * 0.002; player.pitch -= event.movementY * 0.002; player.pitch = clamp(player.pitch, -1.16, 1.02); }
 function onMouseWheel(event) { if (!started || !detailPanel.classList.contains('hidden') || !codexPanel.classList.contains('hidden')) return; event.preventDefault(); player.fov = clamp(player.fov + Math.sign(event.deltaY) * 4, 38, 88); worldClickHint = player.fov <= 46 ? 'Zoomed in' : player.fov >= 82 ? 'Zoomed out' : 'Mouse wheel zoom adjusted'; }
-function onWorldClick() { if (!started) return; if (document.pointerLockElement !== canvas) { lockPointer(); return; } interactWithFocused(); }
+function onWorldClick() {
+  if (!started) return;
+  if (document.pointerLockElement !== canvas) { lockPointer(); return; }
+  if (focusedInteraction && focusedInteraction.userData.type !== 'terrain') { interactWithFocused(); return; }
+  const point = scene.getGroundPointAtCenter?.();
+  if (point) {
+    setNavigationTarget(point.x, point.z);
+    return;
+  }
+  interactWithFocused();
+}
 function onKeyDown(event) { const key = event.key.toLowerCase(); if (movementKeys.has(key)) event.preventDefault(); if (!detailPanel.classList.contains('hidden') && key === 'escape') { event.preventDefault(); closeDetailPanel(); return; } keys.add(key); if (key === 'escape') document.exitPointerLock?.(); if (key === 'c') openCodex(); if (key === 'e') interactWithFocused(); if (key === 'm') startMusic(); if (key === 'r' && !trialModal.classList.contains('hidden')) trial.reset(); }
 
-function loop(ts) { const dt = Math.min(0.033, (ts - (loop.last || ts)) / 1000); loop.last = ts; if (started) update(dt); const beat = director.update(ts); scene.update({ player, activeRealm, discoveredArtifacts: save.data.discoveredArtifacts, repositories: repositoryPayload, cameraBeat: beat }); focusedInteraction = started ? scene.getFocusedInteraction(player, 860) : null; renderInteractionPrompt(); renderDirector(beat); requestAnimationFrame(loop); }
+function loop(ts) { const dt = Math.min(0.033, (ts - (loop.last || ts)) / 1000); loop.last = ts; if (started) update(dt); const beat = director.update(ts); scene.update({ player, activeRealm, discoveredArtifacts: save.data.discoveredArtifacts, repositories: repositoryPayload, cameraBeat: beat, navTarget }); focusedInteraction = started ? scene.getFocusedInteraction(player, 860) : null; renderInteractionPrompt(); renderDirector(beat); requestAnimationFrame(loop); }
 
 function update(dt) {
   world.time += dt;
-  const accel = keys.has('shift') ? 2100 : 1180;
-  const friction = keys.has('shift') ? 0.86 : 0.84;
+  const sprinting = keys.has('shift');
+  const accel = sprinting ? 2100 : 1320;
+  const maxSpeed = sprinting ? 540 : 355;
+  const friction = Math.pow(sprinting ? 0.04 : 0.025, dt);
   let strafe = 0, forward = 0;
   if (keys.has('w') || keys.has('arrowup')) forward += 1;
   if (keys.has('s') || keys.has('arrowdown')) forward -= 1;
   if (keys.has('d') || keys.has('arrowright')) strafe += 1;
   if (keys.has('a') || keys.has('arrowleft')) strafe -= 1;
+
   if (strafe || forward) {
+    navTarget = null;
     const len = Math.hypot(strafe, forward) || 1; strafe /= len; forward /= len;
     const sin = Math.sin(player.yaw), cos = Math.cos(player.yaw);
     player.vx += (cos * strafe + -sin * forward) * accel * dt;
     player.vz += (-sin * strafe + -cos * forward) * accel * dt;
-    player.headBob += dt * (keys.has('shift') ? 18 : 11);
+    player.headBob += dt * (sprinting ? 18 : 11);
+  } else if (navTarget) {
+    const dx = navTarget.x - player.x;
+    const dz = navTarget.z - player.z;
+    const distance = Math.hypot(dx, dz);
+    if (distance < 38) {
+      navTarget = null;
+      player.vx *= 0.28;
+      player.vz *= 0.28;
+      worldClickHint = 'Arrived.';
+    } else {
+      const nx = dx / distance;
+      const nz = dz / distance;
+      const targetYaw = Math.atan2(-nx, -nz);
+      player.yaw += angleDelta(player.yaw, targetYaw) * 0.08;
+      player.vx += nx * accel * dt;
+      player.vz += nz * accel * dt;
+      player.headBob += dt * (sprinting ? 16 : 10);
+    }
   } else player.headBob += (0 - player.headBob) * 0.08;
+
   player.vx *= friction; player.vz *= friction;
-  player.x = clamp(player.x + player.vx * dt, -1450, 1450); player.z = clamp(player.z + player.vz * dt, -1450, 1180);
+  const speed = Math.hypot(player.vx, player.vz);
+  if (speed > maxSpeed) {
+    player.vx = (player.vx / speed) * maxSpeed;
+    player.vz = (player.vz / speed) * maxSpeed;
+  }
+  const resolved = scene.resolveMovement?.(player, player.x + player.vx * dt, player.z + player.vz * dt) || { x: clamp(player.x + player.vx * dt, -1450, 1450), z: clamp(player.z + player.vz * dt, -1450, 1180) };
+  player.x = resolved.x; player.z = resolved.z;
+
   let nearestRealm = null, nearestRealmDistance = Infinity; const priorRealm = activeRealm; activeRealm = null; vaultNear = false;
   for (const realm of realms) { const d = distanceTo(realm.x, realm.z); if (d < nearestRealmDistance) { nearestRealmDistance = d; nearestRealm = realm; } if (d < 285) { activeRealm = realm.id; save.visitRealm(realm.id); const lines = corvusLines[realm.id] || corvusLines.idle; world.corvusText = lines[Math.floor(world.time / 6) % lines.length]; audio.setRealm(realm.id); } }
   vaultNear = distanceTo(0, 850) < 190;
@@ -171,13 +213,19 @@ function update(dt) {
   corvusText.textContent = world.corvusText; renderMinimap();
 }
 
-function interactWithFocused() {
-  if (!focusedInteraction) { if (vaultNear) openTrial(); worldClickHint = 'Nothing selected. Center the reticle on a named building, sign, article wall, project artifact, tablet, river, or terrain feature.'; showToastMessage('Exploration Mode', worldClickHint); return; }
-  const { type, id, label } = focusedInteraction.userData;
-  if (type === 'artifact') inspectArtifact(id); else if (type === 'galleryPost') showGalleryPost(id); else if (type === 'tablet') inspectTablet(Number(id)); else if (type === 'portal') inspectPortal(id); else if (type === 'vault') openTrial(); else if (type === 'river') openDetail('Mill River', 'Mill River', `<p>The river connects the village and represents governed data moving through platforms, workflows, decisions, and people.</p>${mobilePreview('Data River', 'Source systems', 'Pipelines', 'Trusted decisions')}`); else if (type === 'terrain') openCommonsMap(); else openDetail('World Object', label || 'World Object', `<p>${escapeHTML(label || 'This object belongs to the Commons.')}</p>`);
+function setNavigationTarget(x, z) {
+  navTarget = { x: clamp(x, -1420, 1420), z: clamp(z, -1420, 1160) };
+  worldClickHint = 'Moving. Use WASD any time to take manual control.';
 }
 
-function renderInteractionPrompt() { if (!started) return; if (!focusedInteraction) { interactionPrompt.textContent = vaultNear ? 'Click or press E to enter Contact Tower' : (worldClickHint || `Explore ${socialProfile.name} Commons. Hold Shift to sprint. Press M for music. Click named buildings and artifacts for full pages.`); reticle.classList.remove('locked'); return; } const { type, id, label } = focusedInteraction.userData; reticle.classList.add('locked'); if (type === 'artifact') interactionPrompt.textContent = `Click to open: ${artifacts[id]?.title || label}`; else if (type === 'galleryPost') interactionPrompt.textContent = `Click to read article: ${galleryPayload.find((item) => item.id === id)?.title || label}`; else if (type === 'tablet') interactionPrompt.textContent = `Click to read tablet ${Number(id) + 1}`; else if (type === 'portal') interactionPrompt.textContent = `Click to enter: ${realms.find((r) => r.id === id)?.name || label}`; else if (type === 'vault') interactionPrompt.textContent = 'Click to open Contact Tower'; else interactionPrompt.textContent = `Click to inspect: ${label || 'world object'}`; }
+function interactWithFocused() {
+  if (!focusedInteraction) { if (vaultNear) openTrial(); worldClickHint = 'Nothing selected. Center the reticle on a named building, sign, artifact, tablet, river, or open ground.'; showToastMessage('Exploration Mode', worldClickHint); return; }
+  const { type, id, label } = focusedInteraction.userData;
+  if (type === 'terrain') { const point = scene.getGroundPointAtCenter?.(); if (point) setNavigationTarget(point.x, point.z); return; }
+  if (type === 'artifact') inspectArtifact(id); else if (type === 'galleryPost') showGalleryPost(id); else if (type === 'tablet') inspectTablet(Number(id)); else if (type === 'portal') inspectPortal(id); else if (type === 'vault') openTrial(); else if (type === 'river') openDetail('Mill River', 'Mill River', `<p>The river connects the village and represents governed data moving through platforms, workflows, decisions, and people.</p>${mobilePreview('Data River', 'Source systems', 'Pipelines', 'Trusted decisions')}`); else openDetail('World Object', label || 'World Object', `<p>${escapeHTML(label || 'This object belongs to the Commons.')}</p>`);
+}
+
+function renderInteractionPrompt() { if (!started) return; if (!focusedInteraction) { interactionPrompt.textContent = vaultNear ? 'Click or press E to enter Contact Tower' : (worldClickHint || `Explore ${socialProfile.name} Commons. Click open ground to move. WASD overrides click-move. Press E on named targets.`); reticle.classList.remove('locked'); return; } const { type, id, label } = focusedInteraction.userData; reticle.classList.add('locked'); if (type === 'artifact') interactionPrompt.textContent = `Click to open: ${artifacts[id]?.title || label}`; else if (type === 'galleryPost') interactionPrompt.textContent = `Click to read article: ${galleryPayload.find((item) => item.id === id)?.title || label}`; else if (type === 'tablet') interactionPrompt.textContent = `Click to read tablet ${Number(id) + 1}`; else if (type === 'portal') interactionPrompt.textContent = `Click to enter: ${realms.find((r) => r.id === id)?.name || label}`; else if (type === 'vault') interactionPrompt.textContent = 'Click to open Contact Tower'; else if (type === 'terrain') interactionPrompt.textContent = navTarget ? 'Moving to marker. WASD cancels.' : 'Click open ground to walk there'; else interactionPrompt.textContent = `Click to inspect: ${label || 'world object'}`; }
 
 function inspectArtifact(id) {
   const artifact = artifacts[id]; if (!artifact) return;
@@ -218,8 +266,8 @@ function openCodex() { document.exitPointerLock?.(); pauseOverlay.classList.add(
 
 function startCameraBeat(id) { const settings = save?.data?.settings || {}; if (settings.reduceMotion || settings.cinematicCamera === false) return; const beat = director.start(id); if (beat) { directorPanel.classList.remove('hidden'); directorText.textContent = `${beat.title}: ${beat.text}`; } }
 function renderDirector(beatState) { if (!beatState?.active) { if (directorPanel && !director.isPlaying) directorPanel.classList.add('hidden'); return; } const pct = Math.round(beatState.progress * 100); directorPanel.classList.remove('hidden'); directorText.textContent = `${beatState.active.title} / ${pct}% — ${beatState.active.text}`; }
-function updateHud(nearestRealm = null, distance = null) { achievementCount.textContent = `${save.data.achievements.length} achievements`; if (activeRealm) { const realm = realms.find((r) => r.id === activeRealm); objectiveTitle.textContent = realm.quest; objectiveText.textContent = realm.plain || `${realm.short} location active.`; realmTag.textContent = realm.short; } else if (vaultNear) { objectiveTitle.textContent = `Contact ${socialProfile.name}`; objectiveText.textContent = 'Look at Contact Tower and click, or press E, to begin the contact-gate trial.'; realmTag.textContent = 'CONTACT'; } else { objectiveTitle.textContent = `Explore ${socialProfile.name} Commons`; objectiveText.textContent = nearestRealm ? `Nearest named location: ${nearestRealm.name}. Distance ${Math.round(distance)}.` : 'Hold Shift to move faster. Click named locations.'; realmTag.textContent = `${world.syncStatus} workshop`; } }
-function renderMinimap() { const ctx = minimap.getContext('2d'); const w = minimap.width, h = minimap.height; ctx.clearRect(0, 0, w, h); ctx.fillStyle = 'rgba(45,31,18,.72)'; ctx.fillRect(0, 0, w, h); ctx.strokeStyle = 'rgba(240,194,111,.5)'; ctx.strokeRect(1, 1, w - 2, h - 2); const sx = (x) => w / 2 + x / 14, sz = (z) => h / 2 + z / 14; ctx.strokeStyle = 'rgba(240,194,111,.25)'; realms.forEach((realm) => { ctx.beginPath(); ctx.moveTo(sx(0), sz(260)); ctx.lineTo(sx(realm.x), sz(realm.z)); ctx.stroke(); }); realms.forEach((realm) => { ctx.fillStyle = realm.color; ctx.beginPath(); ctx.arc(sx(realm.x), sz(realm.z), activeRealm === realm.id ? 6 : 4, 0, Math.PI * 2); ctx.fill(); }); ctx.fillStyle = '#f2c76d'; ctx.fillRect(sx(0) - 4, sz(850) - 4, 8, 8); ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(sx(player.x), sz(player.z), 4, 0, Math.PI * 2); ctx.fill(); }
+function updateHud(nearestRealm = null, distance = null) { achievementCount.textContent = `${save.data.achievements.length} achievements`; if (activeRealm) { const realm = realms.find((r) => r.id === activeRealm); objectiveTitle.textContent = realm.quest; objectiveText.textContent = realm.plain || `${realm.short} location active.`; realmTag.textContent = realm.short; } else if (vaultNear) { objectiveTitle.textContent = `Contact ${socialProfile.name}`; objectiveText.textContent = 'Look at Contact Tower and click, or press E, to begin the contact-gate trial.'; realmTag.textContent = 'CONTACT'; } else { objectiveTitle.textContent = `Explore ${socialProfile.name} Commons`; objectiveText.textContent = nearestRealm ? `Nearest named location: ${nearestRealm.name}. Distance ${Math.round(distance)}.` : 'Click open ground to move. WASD gives direct control. Named targets are intentionally generous.'; realmTag.textContent = `${world.syncStatus} workshop`; } }
+function renderMinimap() { const ctx = minimap.getContext('2d'); const w = minimap.width, h = minimap.height; ctx.clearRect(0, 0, w, h); ctx.fillStyle = 'rgba(45,31,18,.72)'; ctx.fillRect(0, 0, w, h); ctx.strokeStyle = 'rgba(240,194,111,.5)'; ctx.strokeRect(1, 1, w - 2, h - 2); const sx = (x) => w / 2 + x / 14, sz = (z) => h / 2 + z / 14; ctx.strokeStyle = 'rgba(240,194,111,.25)'; realms.forEach((realm) => { ctx.beginPath(); ctx.moveTo(sx(0), sz(260)); ctx.lineTo(sx(realm.x), sz(realm.z)); ctx.stroke(); }); realms.forEach((realm) => { ctx.fillStyle = realm.color; ctx.beginPath(); ctx.arc(sx(realm.x), sz(realm.z), activeRealm === realm.id ? 6 : 4, 0, Math.PI * 2); ctx.fill(); }); ctx.fillStyle = '#f2c76d'; ctx.fillRect(sx(0) - 4, sz(850) - 4, 8, 8); if (navTarget) { ctx.strokeStyle = '#fff0c8'; ctx.beginPath(); ctx.arc(sx(navTarget.x), sz(navTarget.z), 6, 0, Math.PI * 2); ctx.stroke(); } ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(sx(player.x), sz(player.z), 4, 0, Math.PI * 2); ctx.fill(); }
 function openDetail(kicker, title, html) { document.exitPointerLock?.(); pauseOverlay.classList.add('hidden'); artifactPanel?.classList.add('hidden'); detailKicker.textContent = kicker; detailTitle.textContent = title; detailContent.innerHTML = html; detailPanel.classList.remove('hidden'); }
 function closeDetailPanel() { detailPanel.classList.add('hidden'); detailContent.innerHTML = ''; lockPointer(); }
 function articleText(item) { return item.fullText || item.text || item.content || item.excerpt || ''; }
@@ -233,4 +281,5 @@ function showToastMessage(title, text) { achievementToast.classList.remove('hidd
 function escapeHTML(value = '') { return String(value).replace(/[&<>'"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char])); }
 function escapeAttribute(value = '') { return escapeHTML(value); }
 function distanceTo(x, z) { return Math.hypot(x - player.x, z - player.z); }
+function angleDelta(current, target) { return Math.atan2(Math.sin(target - current), Math.cos(target - current)); }
 function clamp(value, min, max) { return Math.max(min, Math.min(max, value)); }
