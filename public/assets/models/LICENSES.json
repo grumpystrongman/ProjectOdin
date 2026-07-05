@@ -1,0 +1,33 @@
+{
+  "version": "0.5.0-gltf-pipeline",
+  "policy": "Only ship commercial-friendly assets. Prefer CC0. Verify and record every model, texture, and audio source before production release.",
+  "approvedSources": [
+    {
+      "name": "Quaternius",
+      "url": "https://quaternius.com/",
+      "defaultLicense": "CC0 / public domain unless the downloaded pack states otherwise"
+    },
+    {
+      "name": "Kenney",
+      "url": "https://kenney.nl/assets",
+      "defaultLicense": "CC0 unless the downloaded pack states otherwise"
+    },
+    {
+      "name": "Poly Haven",
+      "url": "https://polyhaven.com/",
+      "defaultLicense": "CC0"
+    },
+    {
+      "name": "ambientCG",
+      "url": "https://ambientcg.com/",
+      "defaultLicense": "CC0"
+    }
+  ],
+  "blockedSources": [
+    "Ripped assets from commercial games",
+    "Unverified Sketchfab downloads",
+    "Assets without redistributable/commercial license terms",
+    "Fable, Witcher, Skyrim, or other game-extracted models/textures"
+  ],
+  "assets": []
+}
