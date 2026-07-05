@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { realms, artifacts, tablets } from './content.js';
+import { attachConfiguredAssets } from './assetLoader.js';
 
 export class OdinScene {
   constructor(canvas) {
@@ -28,8 +29,20 @@ export class OdinScene {
     this.signs = [];
     this.interactables = [];
     this.assetAnchors = new Map();
+    this.assetLoader = null;
+    this.assetLoadState = null;
+    this.assetLoadPromise = null;
     this.materials = this.makeMaterials();
     this.init();
+    this.assetLoadPromise = attachConfiguredAssets(this)
+      .then((state) => {
+        this.assetLoadState = state;
+        return state;
+      })
+      .catch((error) => {
+        console.info('[assets] GLTF asset pipeline failed to initialize; procedural fallbacks remain active.', error);
+        return null;
+      });
     window.addEventListener('resize', () => this.resize());
   }
 
