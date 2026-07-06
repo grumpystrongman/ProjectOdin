@@ -1,6 +1,43 @@
 {
-  "generatedAt": "2026-07-05T23:39:00.072Z",
+  "generatedAt": "2026-07-06T15:24:13.200Z",
   "licenseSummary": "Kenney assets are CC0. Poly Haven textures are CC0. The included music download is Creative Commons Attribution 4.0 and requires attribution.",
+  "results": [
+    {
+      "id": "kenney-fantasy-town-kit",
+      "status": "already-present",
+      "url": "https://kenney.nl/media/pages/assets/fantasy-town-kit/efe948d309-1754222374/kenney_fantasy-town-kit_2.0.zip"
+    },
+    {
+      "id": "kenney-nature-kit",
+      "status": "already-present",
+      "url": "https://kenney.nl/media/pages/assets/nature-kit/37ac38a37b-1677698939/kenney_nature-kit.zip"
+    },
+    {
+      "id": "kenney-castle-kit",
+      "status": "already-present",
+      "url": "https://kenney.nl/media/pages/assets/castle-kit/a395102d20-1711543616/kenney_castle-kit.zip"
+    },
+    {
+      "id": "cobblestone-diffuse",
+      "status": "already-present",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/cobblestone_floor_08/cobblestone_floor_08_diff_1k.jpg"
+    },
+    {
+      "id": "cobblestone-normal",
+      "status": "already-present",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/cobblestone_floor_08/cobblestone_floor_08_nor_gl_1k.jpg"
+    },
+    {
+      "id": "cobblestone-rough",
+      "status": "already-present",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/cobblestone_floor_08/cobblestone_floor_08_rough_1k.jpg"
+    },
+    {
+      "id": "village-loop",
+      "status": "already-present",
+      "url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/River%20Flute.mp3"
+    }
+  ],
   "modelFiles": [
     "/assets/vendor/kenney-castle-kit/Models/GLB format/bridge-draw.glb",
     "/assets/vendor/kenney-castle-kit/Models/GLB format/bridge-straight-pillar.glb",
