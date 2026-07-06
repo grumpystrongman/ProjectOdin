@@ -21,9 +21,9 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
 
-      - name: Download free asset packs
+      - name: Download and index free asset packs
         run: npm run assets
 
       - name: Commit downloaded assets
