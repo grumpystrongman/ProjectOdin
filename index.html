@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#2f2115" />
-  <meta name="description" content="Jeff Barnes Commons immersive portfolio: resume, articles, AI, healthcare analytics, data platforms, leadership, extreme sports, and projects." />
+  <meta name="description" content="Jeff Barnes Commons immersive portfolio: resume, articles, AI, healthcare analytics, data platforms, leadership, martial arts, extreme sports, fishing, YouTube, and projects." />
   <link rel="stylesheet" href="/fable-fix.css" />
   <title>Jeff Barnes Commons | Immersive Portfolio</title>
 </head>
@@ -18,8 +18,8 @@
     <p class="eyebrow">Jeff Barnes Commons</p>
     <h1>Jeff Barnes</h1>
     <p class="subtitle">Principal Enterprise Architect / Platform Transformation Executive</p>
-    <p class="identity-line">Healthcare analytics • enterprise architecture • data engineering • AI governance • platform modernization • leadership • extreme sports</p>
-    <p class="landing-about">Walk through a storybook fantasy village built around my resume, public writing, projects, AI work, healthcare analytics background, leadership philosophy, martial arts, and extreme sports history.</p>
+    <p class="identity-line">Healthcare analytics • enterprise architecture • data engineering • AI governance • platform modernization • leadership • martial arts • extreme sports</p>
+    <p class="landing-about">Walk through a storybook fantasy village built around my resume, public writing, projects, AI work, healthcare analytics background, leadership philosophy, martial arts, fishing, YouTube plans, and extreme sports history.</p>
     <div class="title-actions">
       <button id="startButton">Enter the Commons</button>
       <button id="resumeButton">Open Resume</button>
@@ -28,7 +28,7 @@
       <button id="musicButton">Start Music</button>
     </div>
     <button id="continueButton" class="continue-hidden">Continue Journey</button>
-    <p class="hint">Mouse-look uses pointer lock. Move with WASD or arrow keys. Hold Shift to sprint faster. Mouse wheel zooms. Click named buildings, signs, articles, and artifacts to open full readable panels. Press Esc to release the mouse.</p>
+    <p class="hint">Mouse-look uses pointer lock. Move with WASD or arrow keys. Hold Shift to sprint faster. Mouse wheel zooms. Open the map to travel directly to any district. Press Esc to release the mouse.</p>
   </section>
 
   <div id="reticle" class="reticle hidden" aria-hidden="true"></div>
@@ -52,7 +52,7 @@
     <div>
       <p class="hud-label">Objective</p>
       <h2 id="objectiveTitle">Explore Jeff Barnes Commons</h2>
-      <p id="objectiveText">Start in the Commons, then visit Resume Hall, Chronicle House, The Foundry, AI Workshop, Healthcare Analytics Hall, Leadership Library, Project Workshop, and the Proving Grounds.</p>
+      <p id="objectiveText">Start in the Commons, then use the map to visit Resume Hall, Chronicle House, The Foundry, AI Workshop, Healthcare Analytics Hall, Leadership Library, Project Workshop, YouTube Theater, Angler’s Wharf, Hall of Disciplines, and the Proving Grounds.</p>
     </div>
     <canvas id="minimap" width="220" height="150" aria-label="District minimap"></canvas>
     <div class="hud-row">
@@ -105,8 +105,7 @@
     </div>
   </section>
 
-  <script type="module" src="/src/game/extremeSportsPatch.js"></script>
-  <script type="module" src="/src/game/vendorAssetPatch.js"></script>
+  <script type="module" src="/src/game/siteBuildPatch.js"></script>
   <script type="module" src="/src/main.js"></script>
 </body>
 </html>
