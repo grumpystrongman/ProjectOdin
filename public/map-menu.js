@@ -1,23 +1,52 @@
 (() => {
   const SAVE_KEY = 'project-odin-save-v4';
+  const MAP_BOUNDS = { minX: -1500, maxX: 1500, minZ: -900, maxZ: 1050 };
+
   const DESTINATIONS = [
-    { id: 'about', name: 'Jeff Barnes Commons', short: 'COMMONS', desc: 'Start here: identity, site map, about Jeff, and resume access.', x: 0, z: 520, color: '#f0c26f' },
-    { id: 'resume', name: 'Resume Hall', short: 'RESUME', desc: 'Career history, accomplishments, executive summary, skills, and credentials.', x: -760, z: 150, color: '#d9a85c' },
-    { id: 'chronicle', name: 'Chronicle House', short: 'WRITING', desc: 'Articles, posts, public voice, essays, and long-form thinking.', x: -650, z: 620, color: '#8ec1ff' },
-    { id: 'foundry', name: 'The Foundry', short: 'DATA PLATFORM', desc: 'Fabric, Databricks, dbt, architecture, semantic modeling, and cloud platforms.', x: -220, z: -260, color: '#ff9d4a' },
-    { id: 'ai', name: 'AI Workshop', short: 'AI', desc: 'AI governance, LLM workflows, ThreadlineAI, agents, and responsible adoption.', x: 720, z: 90, color: '#6ee7d8' },
-    { id: 'healthcare', name: 'Healthcare Analytics Hall', short: 'HEALTHCARE', desc: 'Epic, Clarity, operational analytics, decision support, and patient access.', x: -760, z: -620, color: '#8fcf9f' },
+    { id: 'about', name: 'Jeff Barnes Commons', short: 'COMMONS', desc: 'Start here: identity, site map, about Jeff, and resume access.', x: 0, z: 500, color: '#f0c26f' },
+    { id: 'resume', name: 'Resume Hall', short: 'RESUME', desc: 'Career history, accomplishments, executive summary, skills, and credentials.', x: -680, z: 80, color: '#d9a85c' },
+    { id: 'chronicle', name: 'Chronicle House', short: 'WRITING', desc: 'Articles, posts, public voice, essays, and long-form thinking.', x: -600, z: 620, color: '#8ec1ff' },
+    { id: 'foundry', name: 'The Foundry', short: 'DATA PLATFORM', desc: 'Fabric, Databricks, dbt, architecture, semantic modeling, and cloud platforms.', x: -220, z: -255, color: '#ff9d4a' },
+    { id: 'ai', name: 'AI Workshop', short: 'AI', desc: 'AI governance, LLM workflows, ThreadlineAI, agents, and responsible adoption.', x: 700, z: 85, color: '#6ee7d8' },
+    { id: 'healthcare', name: 'Healthcare Analytics Hall', short: 'HEALTHCARE', desc: 'Epic, Clarity, operational analytics, decision support, and patient access.', x: -690, z: -620, color: '#8fcf9f' },
     { id: 'leadership', name: 'Leadership Library', short: 'LEADERSHIP', desc: 'Leadership philosophy, coaching, governance, value-stream design, and people systems.', x: 420, z: -650, color: '#bca3ff' },
-    { id: 'workshop', name: 'Project Workshop', short: 'PROJECTS', desc: 'GitHub, ThreadlineAI, Project Odin, OpenAegis, OpenPulse, and prototypes.', x: 620, z: 610, color: '#72ffc2' },
-    { id: 'youtube', name: 'YouTube Theater', short: 'YOUTUBE', desc: 'Videos, demos, talks, shorts, and public storytelling.', x: -1120, z: 60, color: '#ff6a61' },
-    { id: 'fishing', name: 'Angler’s Wharf', short: 'FISHING', desc: 'Fishing, Alaska, outdoors, travel, and personal adventure.', x: 1130, z: 260, color: '#5fd1c7' },
-    { id: 'martial', name: 'Hall of Disciplines', short: 'MARTIAL ARTS', desc: 'Martial arts lineage, Feng Xiao Zhang, Tae Kwon Do, Karate, Kung Fu, Kyusho, and BJJ.', x: -1080, z: -270, color: '#f1c453' },
-    { id: 'extreme-sports', name: 'Proving Grounds', short: 'EXTREME SPORTS', desc: 'Powerlifting, strongman, Spartan Trifectas, ultras, and Team USA Bohurt.', x: 1040, z: -430, color: '#ff5f45' },
-    { id: 'contact', name: 'Contact Tower', short: 'CONTACT', desc: 'Contact Jeff Barnes and open the final contact gate.', x: 0, z: 850, color: '#fff0c6' }
+    { id: 'workshop', name: 'Project Workshop', short: 'PROJECTS', desc: 'GitHub, ThreadlineAI, Project Odin, OpenAegis, OpenPulse, and prototypes.', x: 650, z: 620, color: '#72ffc2' },
+    { id: 'youtube', name: 'YouTube Theater', short: 'YOUTUBE', desc: 'Videos, demos, talks, shorts, and public storytelling.', x: -980, z: 45, color: '#ff6a61' },
+    { id: 'fishing', name: 'Angler’s Wharf', short: 'FISHING', desc: 'Fishing, Alaska, outdoors, travel, and personal adventure.', x: 1060, z: 260, color: '#5fd1c7' },
+    { id: 'martial', name: 'Hall of Disciplines', short: 'MARTIAL ARTS', desc: 'Martial arts lineage, Feng Xiao Zhang, Tae Kwon Do, Karate, Kung Fu, Kyusho, and BJJ.', x: -980, z: -270, color: '#f1c453' },
+    { id: 'extreme-sports', name: 'Proving Grounds', short: 'EXTREME SPORTS', desc: 'Powerlifting, strongman, Spartan Trifectas, ultras, and Team USA Bohurt.', x: 980, z: -430, color: '#ff5f45' },
+    { id: 'contact', name: 'Contact Tower', short: 'CONTACT', desc: 'Contact Jeff Barnes and open the final contact gate.', x: 0, z: 760, color: '#fff0c6' }
   ];
 
   const style = `
-    .odin-map-overlay{position:fixed!important;inset:0!important;z-index:2147483000!important;background:radial-gradient(circle at 50% 20%,rgba(216,170,84,.2),rgba(8,5,2,.96) 58%,#000 100%)!important;color:#fff0c6!important;overflow:auto!important;padding:18px!important;box-sizing:border-box!important;font-family:Georgia,'Times New Roman',serif!important}.odin-map-overlay.hidden{display:none!important}.odin-map-shell{max-width:1780px!important;margin:0 auto!important;display:grid!important;grid-template-columns:minmax(720px,1.6fr) minmax(320px,.55fr)!important;gap:16px!important}.odin-map-header{grid-column:1/-1!important;display:flex!important;justify-content:space-between!important;gap:16px!important;align-items:end!important;padding:18px 22px!important;border:1px solid rgba(240,194,111,.5)!important;border-radius:18px!important;background:linear-gradient(145deg,rgba(55,32,12,.94),rgba(16,9,3,.94))!important;box-shadow:0 18px 60px rgba(0,0,0,.38)!important}.odin-map-header h2{font-size:clamp(2.1rem,4vw,5rem)!important;line-height:.9!important;margin:.15rem 0!important;color:#fff2c8!important;text-shadow:0 4px 18px rgba(0,0,0,.35)!important}.odin-map-header p{margin:.2rem 0!important;max-width:880px!important;color:rgba(255,240,198,.84)!important}.odin-map-header .eyebrow,.odin-card .eyebrow,.odin-map-detail .eyebrow{font:900 .76rem system-ui,sans-serif!important;letter-spacing:.16em!important;text-transform:uppercase!important;color:#f0c26f!important}.odin-map-actions{display:flex!important;gap:10px!important;flex-wrap:wrap!important;justify-content:flex-end!important}.odin-map-overlay button{border:1px solid rgba(240,194,111,.66)!important;border-radius:10px!important;background:linear-gradient(180deg,#7d4f22,#2e1a0a)!important;color:#fff0c6!important;font:900 .82rem system-ui,sans-serif!important;letter-spacing:.06em!important;text-transform:uppercase!important;padding:10px 13px!important;cursor:pointer!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 9px 25px rgba(0,0,0,.3)!important}.odin-map-overlay button:hover{filter:brightness(1.14)!important}.odin-map-art{position:relative!important;min-height:calc(100vh - 220px)!important;border:3px solid #261205!important;border-radius:28px!important;overflow:hidden!important;background:#c99b52!important;box-shadow:inset 0 0 160px rgba(37,18,5,.82),0 24px 90px rgba(0,0,0,.5)!important}.odin-map-art svg{position:absolute!important;inset:0!important;width:100%!important;height:100%!important}.odin-pin{position:absolute!important;z-index:6!important;transform:translate(-50%,-50%)!important;min-width:138px!important;max-width:190px!important;border:2px solid #251105!important;border-radius:999px!important;background:linear-gradient(180deg,#fff0b8,#b88639)!important;color:#201005!important;padding:8px 10px!important;text-align:center!important;font:900 .75rem Georgia,serif!important;box-shadow:0 9px 24px rgba(0,0,0,.38),0 0 0 5px color-mix(in srgb,var(--pin),transparent 58%)!important}.odin-pin:after{content:''!important;position:absolute!important;left:50%!important;bottom:-13px!important;width:16px!important;height:16px!important;background:var(--pin)!important;border:2px solid #251105!important;transform:translateX(-50%) rotate(45deg)!important;z-index:-1!important}.odin-pin:hover,.odin-pin:focus{filter:brightness(1.12)!important;transform:translate(-50%,-50%) scale(1.05)!important}.odin-map-detail{border:1px solid rgba(240,194,111,.48)!important;border-radius:18px!important;background:linear-gradient(145deg,rgba(55,33,14,.93),rgba(14,8,3,.93))!important;padding:18px!important;box-shadow:0 18px 60px rgba(0,0,0,.35)!important}.odin-map-detail h3{font-size:2.2rem!important;line-height:1!important;color:#fff2c8!important;margin:.2rem 0 .75rem!important}.odin-map-detail p{color:rgba(255,240,198,.84)!important}.odin-card-grid{grid-column:1/-1!important;display:grid!important;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))!important;gap:12px!important}.odin-card{border:1px solid rgba(240,194,111,.32)!important;border-radius:16px!important;padding:14px!important;background:linear-gradient(145deg,rgba(255,236,177,.08),rgba(0,0,0,.18))!important}.odin-card h3{color:#fff2c8!important;margin:.2rem 0!important}.odin-card p{color:rgba(255,240,198,.78)!important}.odin-card.active{border-color:rgba(240,194,111,.84)!important;box-shadow:0 0 0 2px rgba(240,194,111,.15)!important}.odin-card button{width:100%!important;margin-top:7px!important}.odin-map-floating{position:fixed!important;right:18px!important;top:16px!important;z-index:2147482000!important;display:flex!important;align-items:center!important;gap:8px!important;border:1px solid rgba(240,194,111,.76)!important;border-radius:999px!important;background:linear-gradient(145deg,rgba(61,36,15,.96),rgba(16,9,3,.94))!important;color:#fff0c6!important;padding:8px 12px!important;box-shadow:0 14px 40px rgba(0,0,0,.45)!important}.odin-map-floating kbd{display:inline-grid!important;place-items:center!important;width:32px!important;height:32px!important;border-radius:7px!important;background:#f0c26f!important;color:#211006!important;font-weight:1000!important}.odin-map-floating span{font:900 .8rem system-ui,sans-serif!important;letter-spacing:.05em!important;text-transform:uppercase!important}@media(max-width:980px){.odin-map-shell{grid-template-columns:1fr!important}.odin-map-header{align-items:start!important;flex-direction:column!important}.odin-map-art{min-height:72vh!important}.odin-pin{min-width:100px!important;font-size:.62rem!important;padding:6px!important}.odin-map-floating{top:auto!important;bottom:16px!important;right:16px!important}}
+    .odin-map-overlay{position:fixed!important;inset:0!important;z-index:2147483000!important;background:radial-gradient(circle at 50% 20%,rgba(216,170,84,.2),rgba(8,5,2,.96) 58%,#000 100%)!important;color:#fff0c6!important;overflow:auto!important;padding:18px!important;box-sizing:border-box!important;font-family:Georgia,'Times New Roman',serif!important}
+    .odin-map-overlay.hidden{display:none!important}
+    .odin-map-shell{max-width:1780px!important;margin:0 auto!important;display:grid!important;grid-template-columns:minmax(720px,1.6fr) minmax(320px,.55fr)!important;gap:16px!important}
+    .odin-map-header{grid-column:1/-1!important;display:flex!important;justify-content:space-between!important;gap:16px!important;align-items:end!important;padding:18px 22px!important;border:1px solid rgba(240,194,111,.5)!important;border-radius:18px!important;background:linear-gradient(145deg,rgba(55,32,12,.94),rgba(16,9,3,.94))!important;box-shadow:0 18px 60px rgba(0,0,0,.38)!important}
+    .odin-map-header h2{font-size:clamp(2.1rem,4vw,5rem)!important;line-height:.9!important;margin:.15rem 0!important;color:#fff2c8!important;text-shadow:0 4px 18px rgba(0,0,0,.35)!important}
+    .odin-map-header p{margin:.2rem 0!important;max-width:880px!important;color:rgba(255,240,198,.84)!important}
+    .odin-map-header .eyebrow,.odin-card .eyebrow,.odin-map-detail .eyebrow{font:900 .76rem system-ui,sans-serif!important;letter-spacing:.16em!important;text-transform:uppercase!important;color:#f0c26f!important}
+    .odin-map-actions{display:flex!important;gap:10px!important;flex-wrap:wrap!important;justify-content:flex-end!important}
+    .odin-map-overlay button{border:1px solid rgba(240,194,111,.66)!important;border-radius:10px!important;background:linear-gradient(180deg,#7d4f22,#2e1a0a)!important;color:#fff0c6!important;font:900 .82rem system-ui,sans-serif!important;letter-spacing:.06em!important;text-transform:uppercase!important;padding:10px 13px!important;cursor:pointer!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 9px 25px rgba(0,0,0,.3)!important}
+    .odin-map-overlay button:hover{filter:brightness(1.14)!important}
+    .odin-map-art{position:relative!important;min-height:calc(100vh - 220px)!important;border:3px solid #261205!important;border-radius:28px!important;overflow:hidden!important;background:#c99b52!important;box-shadow:inset 0 0 160px rgba(37,18,5,.82),0 24px 90px rgba(0,0,0,.5)!important}
+    .odin-map-art svg{position:absolute!important;inset:0!important;width:100%!important;height:100%!important}
+    .odin-pin{position:absolute!important;z-index:6!important;transform:translate(-50%,-50%)!important;min-width:124px!important;max-width:172px!important;border:2px solid #251105!important;border-radius:999px!important;background:linear-gradient(180deg,#fff0b8,#b88639)!important;color:#201005!important;padding:7px 9px!important;text-align:center!important;font:900 .7rem Georgia,serif!important;box-shadow:0 9px 24px rgba(0,0,0,.38),0 0 0 5px color-mix(in srgb,var(--pin),transparent 58%)!important}
+    .odin-pin:after{content:''!important;position:absolute!important;left:50%!important;bottom:-13px!important;width:16px!important;height:16px!important;background:var(--pin)!important;border:2px solid #251105!important;transform:translateX(-50%) rotate(45deg)!important;z-index:-1!important}
+    .odin-pin:hover,.odin-pin:focus{filter:brightness(1.12)!important;transform:translate(-50%,-50%) scale(1.05)!important}
+    .odin-map-detail{border:1px solid rgba(240,194,111,.48)!important;border-radius:18px!important;background:linear-gradient(145deg,rgba(55,33,14,.93),rgba(14,8,3,.93))!important;padding:18px!important;box-shadow:0 18px 60px rgba(0,0,0,.35)!important}
+    .odin-map-detail h3{font-size:2.2rem!important;line-height:1!important;color:#fff2c8!important;margin:.2rem 0 .75rem!important}
+    .odin-map-detail p{color:rgba(255,240,198,.84)!important}
+    .odin-card-grid{grid-column:1/-1!important;display:grid!important;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))!important;gap:12px!important}
+    .odin-card{border:1px solid rgba(240,194,111,.32)!important;border-radius:16px!important;padding:14px!important;background:linear-gradient(145deg,rgba(255,236,177,.08),rgba(0,0,0,.18))!important}
+    .odin-card h3{color:#fff2c8!important;margin:.2rem 0!important}
+    .odin-card p{color:rgba(255,240,198,.78)!important}
+    .odin-card.active{border-color:rgba(240,194,111,.84)!important;box-shadow:0 0 0 2px rgba(240,194,111,.15)!important}
+    .odin-card button{width:100%!important;margin-top:7px!important}
+    .odin-map-floating{position:fixed!important;right:18px!important;top:16px!important;z-index:2147482000!important;display:flex!important;align-items:center!important;gap:8px!important;border:1px solid rgba(240,194,111,.76)!important;border-radius:999px!important;background:linear-gradient(145deg,rgba(61,36,15,.96),rgba(16,9,3,.94))!important;color:#fff0c6!important;padding:8px 12px!important;box-shadow:0 14px 40px rgba(0,0,0,.45)!important}
+    .odin-map-floating kbd{display:inline-grid!important;place-items:center!important;width:32px!important;height:32px!important;border-radius:7px!important;background:#f0c26f!important;color:#211006!important;font-weight:1000!important}
+    .odin-map-floating span{font:900 .8rem system-ui,sans-serif!important;letter-spacing:.05em!important;text-transform:uppercase!important}
+    @media(max-width:980px){.odin-map-shell{grid-template-columns:1fr!important}.odin-map-header{align-items:start!important;flex-direction:column!important}.odin-map-art{min-height:72vh!important}.odin-pin{min-width:96px!important;font-size:.58rem!important;padding:6px!important}.odin-map-floating{top:auto!important;bottom:16px!important;right:16px!important}}
   `;
 
   function ensureStyle() {
@@ -29,11 +58,13 @@
   }
 
   function pctX(x) {
-    return ((x - -1220) / (1220 - -1220)) * 100;
+    const pct = ((x - MAP_BOUNDS.minX) / (MAP_BOUNDS.maxX - MAP_BOUNDS.minX)) * 100;
+    return Math.max(9, Math.min(91, pct));
   }
 
   function pctY(z) {
-    return (1 - ((z - -780) / (980 - -780))) * 100;
+    const pct = (1 - ((z - MAP_BOUNDS.minZ) / (MAP_BOUNDS.maxZ - MAP_BOUNDS.minZ))) * 100;
+    return Math.max(8, Math.min(92, pct));
   }
 
   function mapSvg() {
@@ -81,7 +112,6 @@
     ensureStyle();
     let overlay = document.getElementById('odinMapOverlay');
     if (overlay) return overlay;
-
     overlay = document.createElement('section');
     overlay.id = 'odinMapOverlay';
     overlay.className = 'odin-map-overlay hidden';
@@ -98,7 +128,7 @@
     const overlay = buildOverlay();
     overlay.classList.remove('hidden');
     setActive(DESTINATIONS[0].id);
-    if (document.exitPointerLock) document.exitPointerLock();
+    document.exitPointerLock?.();
   }
 
   function closeMap() {
@@ -128,26 +158,22 @@
     installFloatingButton();
     window.ProjectOdinMap = { open: openMap, close: closeMap, travel };
     window.openOdinMap = openMap;
-
     document.addEventListener('click', (event) => {
       const mapTrigger = event.target.closest?.('[data-open-map-first], #openMapButton, #titleMapButton, #mapMenuButton, #odinMapFloating');
       const destination = event.target.closest?.('[data-odin-destination]');
       const travelButton = event.target.closest?.('[data-odin-travel]');
       const closeButton = event.target.closest?.('[data-odin-close]');
       const resetButton = event.target.closest?.('[data-odin-reset]');
-
       if (mapTrigger) { event.preventDefault(); event.stopPropagation(); openMap(); return; }
       if (destination) { event.preventDefault(); event.stopPropagation(); setActive(destination.dataset.odinDestination); return; }
       if (travelButton) { event.preventDefault(); event.stopPropagation(); travel(travelButton.dataset.odinTravel); return; }
       if (closeButton) { event.preventDefault(); event.stopPropagation(); closeMap(); return; }
       if (resetButton) { event.preventDefault(); event.stopPropagation(); try { localStorage.removeItem(SAVE_KEY); } catch {}; location.reload(); }
     }, true);
-
     document.addEventListener('mouseover', (event) => {
       const destination = event.target.closest?.('[data-odin-destination]');
       if (destination) setActive(destination.dataset.odinDestination);
     }, true);
-
     document.addEventListener('keydown', (event) => {
       if (event.key?.toLowerCase() === 'm') { event.preventDefault(); event.stopPropagation(); openMap(); }
       if (event.key === 'Escape' && !document.getElementById('odinMapOverlay')?.classList.contains('hidden')) closeMap();
