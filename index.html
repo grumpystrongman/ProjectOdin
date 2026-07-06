@@ -28,7 +28,7 @@
       <button id="musicButton">Start Music</button>
     </div>
     <button id="continueButton" class="continue-hidden">Continue Journey</button>
-    <p class="hint">Mouse-look uses pointer lock. Move with WASD or arrow keys. Hold Shift to sprint faster. Mouse wheel zooms. Open the map to travel directly to any district. Press Esc to release the mouse.</p>
+    <p class="hint">Mouse-look uses pointer lock. Move with WASD or arrow keys. Hold Shift to sprint faster. Mouse wheel zooms. Press M for the large map, menu, and district travel. Press Esc to release the mouse.</p>
   </section>
 
   <div id="reticle" class="reticle hidden" aria-hidden="true"></div>
@@ -106,6 +106,7 @@
   </section>
 
   <script type="module" src="/src/game/siteBuildPatch.js"></script>
+  <script type="module" src="/src/game/visualRebuildPatch.js"></script>
   <script type="module" src="/src/main.js"></script>
 </body>
 </html>
