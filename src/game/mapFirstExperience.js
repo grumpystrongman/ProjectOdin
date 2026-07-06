@@ -40,12 +40,10 @@ function saveTravel(realm) {
     data.lastRealm = realm.id;
     data.player = { x: Math.round(realm.x), z: Math.round(realm.z - 175), yaw: 0, pitch: -0.05, fov: 66 };
     localStorage.setItem(SAVE_KEY, JSON.stringify(data));
-  } catch {
-    // Ignore localStorage failures. Travel will degrade to close-only behavior.
-  }
+  } catch {}
 }
 
-function makeMountainRange(idPrefix, count, startX, startY, width, height) {
+function makeMountainRange(count, startX, startY, width, height) {
   let output = '';
   for (let i = 0; i < count; i++) {
     const x = startX + i * width * 0.7;
@@ -82,8 +80,8 @@ function mapSvg() {
     <path class="map-road" d="M250 754 C394 661 530 647 685 540 C818 448 920 471 1068 578 C1197 671 1320 626 1470 712"/>
     <path class="map-road thin" d="M788 455 C721 574 682 690 681 865"/>
     <path class="map-road thin" d="M788 455 C668 340 560 270 423 173"/>
-    ${makeMountainRange('n', 10, 1010, 92, 76, 122)}
-    ${makeMountainRange('s', 9, 780, 768, 70, 106)}
+    ${makeMountainRange(10, 1010, 92, 76, 122)}
+    ${makeMountainRange(9, 780, 768, 70, 106)}
     ${makeForest(52, 92, 135, 405, 260)}
     ${makeForest(42, 1090, 545, 355, 225)}
     <circle class="map-compass-ring" cx="178" cy="785" r="82"/>
@@ -126,7 +124,7 @@ function buildOverlay() {
   overlay.innerHTML = `
     <div class="map-first-shell">
       <header class="map-first-header">
-        <div><p class="eyebrow">Map & Menu</p><h2>${safe(socialProfile.name)} Commons</h2><p>Choose a destination. This is the primary navigation experience until the 3D art is strong enough to carry the site.</p></div>
+        <div><p class="eyebrow">Map & Menu</p><h2>${safe(socialProfile.name)} Commons</h2><p>Choose a destination. This map is the main navigation experience while the 3D village art is rebuilt.</p></div>
         <div class="map-first-actions"><button data-close-map>Explore 3D</button><button data-reset-map-save>Reset Spawn</button></div>
       </header>
       <div class="novel-map-wrap">${mapSvg()}${pins}</div>
@@ -144,7 +142,6 @@ function buildOverlay() {
   overlay.querySelectorAll('[data-map-destination]').forEach((button) => button.addEventListener('focus', () => showDetail(button.dataset.mapDestination)));
   overlay.querySelectorAll('[data-map-destination]').forEach((button) => button.addEventListener('click', () => travel(button.dataset.mapDestination)));
   overlay.querySelectorAll('[data-travel-now]').forEach((button) => button.addEventListener('click', () => travel(button.dataset.travelNow)));
-
   return overlay;
 }
 
@@ -171,30 +168,34 @@ function travel(id) {
   if (!realm) return;
   saveTravel(realm);
   const overlay = buildOverlay();
-  overlay.querySelector('.map-first-header p:last-child').textContent = `Traveling to ${realm.name}. Reloading at that district.`;
+  const status = overlay.querySelector('.map-first-header p:last-child');
+  if (status) status.textContent = `Traveling to ${realm.name}. Reloading at that district.`;
   setTimeout(() => location.reload(), 280);
 }
 
 function install() {
   buildOverlay();
-  document.addEventListener('keydown', (event) => {
+  window.ProjectOdinMap = { open: openMap, close: closeMap, travel };
+
+  window.addEventListener('keydown', (event) => {
     if (event.key?.toLowerCase() === 'm') {
       event.preventDefault();
       event.stopPropagation();
+      event.stopImmediatePropagation?.();
       openMap();
     }
     if (event.key === 'Escape' && !document.getElementById('mapFirstOverlay')?.classList.contains('hidden')) closeMap();
   }, true);
 
-  document.getElementById('mapMenuButton')?.addEventListener('click', (event) => {
+  document.addEventListener('click', (event) => {
+    const target = event.target?.closest?.('[data-open-map-first], #mapMenuButton, #openMapButton, #titleMapButton');
+    if (!target) return;
     event.preventDefault();
     event.stopPropagation();
     openMap();
   }, true);
 
-  document.getElementById('startButton')?.addEventListener('click', () => {
-    setTimeout(openMap, 450);
-  });
+  document.getElementById('startButton')?.addEventListener('click', () => setTimeout(openMap, 450));
 }
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', install);
