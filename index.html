@@ -22,23 +22,25 @@
     <p class="landing-about">Walk through a storybook fantasy village built around my resume, public writing, projects, AI work, healthcare analytics background, leadership philosophy, martial arts, fishing, YouTube plans, and extreme sports history.</p>
     <div class="title-actions">
       <button id="startButton">Enter the Commons</button>
+      <button id="titleMapButton" data-open-map-first>Open Map & Menu</button>
       <button id="resumeButton">Open Resume</button>
       <button id="aboutButton">About Me</button>
       <button id="codexButton">Open Codex</button>
       <button id="musicButton">Start Music</button>
     </div>
     <button id="continueButton" class="continue-hidden">Continue Journey</button>
-    <p class="hint">Mouse-look uses pointer lock. Move with WASD or arrow keys. Hold Shift to sprint faster. Mouse wheel zooms. Press M for the large map, menu, and district travel. Press Esc to release the mouse.</p>
+    <p class="hint"><strong>Press M</strong> or click <strong>Open Map & Menu</strong> for the large Tolkien-style map and district travel. Mouse-look uses pointer lock. Move with WASD or arrow keys. Press Esc to release the mouse.</p>
   </section>
 
   <div id="reticle" class="reticle hidden" aria-hidden="true"></div>
-  <div id="interactionPrompt" class="interaction-prompt hidden">Explore Jeff Barnes Commons. Click named buildings, signs, and article walls.</div>
+  <div id="interactionPrompt" class="interaction-prompt hidden">Explore Jeff Barnes Commons. Press M for the map, or click named buildings and signs.</div>
 
   <aside id="pauseOverlay" class="pause-overlay hidden">
     <p class="eyebrow">Paused</p>
     <h2>Mouse released</h2>
-    <p>Click Resume or click the world to re-enter mouse-look.</p>
+    <p>Use the map as the main menu, or click Resume to re-enter mouse-look.</p>
     <div class="pause-actions">
+      <button id="openMapButton" data-open-map-first>Open Map / Press M</button>
       <button id="resumePointerButton">Resume</button>
       <button id="musicPauseButton">Music</button>
       <button id="syncButton">Sync Workshop</button>
@@ -52,7 +54,7 @@
     <div>
       <p class="hud-label">Objective</p>
       <h2 id="objectiveTitle">Explore Jeff Barnes Commons</h2>
-      <p id="objectiveText">Start in the Commons, then use the map to visit Resume Hall, Chronicle House, The Foundry, AI Workshop, Healthcare Analytics Hall, Leadership Library, Project Workshop, YouTube Theater, Angler’s Wharf, Hall of Disciplines, and the Proving Grounds.</p>
+      <p id="objectiveText">Press M for the large map and menu, then visit Resume Hall, Chronicle House, The Foundry, AI Workshop, Healthcare Analytics Hall, Leadership Library, Project Workshop, YouTube Theater, Angler’s Wharf, Hall of Disciplines, and the Proving Grounds.</p>
     </div>
     <canvas id="minimap" width="220" height="150" aria-label="District minimap"></canvas>
     <div class="hud-row">
